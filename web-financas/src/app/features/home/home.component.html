@@ -1,0 +1,78 @@
+<main class="dashboard-page">
+  <div class="page-width">
+    <app-private-header (logoutRequested)="logout()" />
+    @if (sessionError) { <p class="page-alert" role="alert">{{ sessionError }}</p> }
+
+    <section class="page-intro" aria-labelledby="summary-title">
+      <div>
+        <p class="welcome-label">VISÃO GERAL</p>
+        <h1 id="summary-title">Olá{{ firstName ? ', ' + firstName : '' }}.</h1>
+        <p class="intro-lead">Acompanhe suas movimentações e mantenha seu dinheiro sob controle.</p>
+      </div>
+      <a class="primary-action" routerLink="/movimentacoes" [queryParams]="{ mes: monthKey, novo: '1' }"><span aria-hidden="true">+</span> Nova movimentação</a>
+    </section>
+
+    <section class="ledger dashboard-workspace" aria-label="Resumo financeiro por mês" [attr.aria-busy]="isLoading">
+      <app-period-navigation variant="toolbar" [label]="monthHeading" [month]="monthIndex + 1" [isCurrentMonth]="isCurrentMonth"
+        (monthChanged)="changeMonth($event)" (currentMonthRequested)="goToCurrentMonth()" />
+      <div class="ledger-content">
+        @if (isLoading) {
+          <div class="state-panel" role="status"><span class="loading-mark" aria-hidden="true"></span><p>Organizando seu resumo...</p></div>
+        } @else if (errorMessage) {
+          <div class="state-panel" role="alert">
+            <span class="state-symbol" aria-hidden="true">!</span>
+            <h2>Seu resumo não carregou</h2><p>{{ errorMessage }}</p>
+            <button class="text-action" type="button" (click)="loadSummary()">Tentar novamente</button>
+          </div>
+        } @else if (summary; as data) {
+          @if (data.totalRegistros === 0) {
+            <div class="state-panel empty-state">
+              <svg class="empty-illustration" viewBox="0 0 160 90" fill="none" aria-hidden="true"><path d="M20 8h110v72H20zM40 8v72M20 32h110M20 48h110M20 64h110" stroke="#c7bdca"/><path d="M51 22h34" stroke="#776780" stroke-width="2"/><circle cx="130" cy="65" r="17" fill="#efb39b"/><path d="M123 65h14M130 58v14" stroke="#25243b" stroke-width="2"/></svg>
+              <p class="eyebrow">UMA PÁGINA EM BRANCO</p>
+              <h2>O primeiro registro muda a perspectiva.</h2>
+              <p>Não há movimentações até {{ monthLabel }}. Adicione uma entrada ou saída que já aconteceu para começar seu resumo.</p>
+              <a class="text-action" routerLink="/movimentacoes" [queryParams]="{ mes: monthKey, novo: '1' }">Registrar uma movimentação <span aria-hidden="true">↗</span></a>
+            </div>
+          } @else {
+            <section class="balance-section" aria-labelledby="balance-title">
+              <div class="balance-heading"><p class="eyebrow">SALDO DOS REGISTROS</p><span class="record-stamp">ATUALIZADO ATÉ {{ balanceDate }}</span></div>
+              <div class="balance-main">
+                <div><h2 id="balance-title">Disponível no seu controle</h2><p class="balance-value" [class.negative]="data.saldoAcumulado < 0">{{ formatMoney(data.saldoAcumulado) }}</p></div>
+                <p class="balance-note">Baseado nas entradas e saídas registradas por você. Não é um saldo bancário sincronizado.</p>
+              </div>
+              <dl class="balance-detail"><div><dt>Saldo anterior ao mês</dt><dd>{{ formatMoney(data.saldoAnterior) }}</dd></div><div><dt>Resultado do mês</dt><dd [class.positive]="data.resultado > 0" [class.negative]="data.resultado < 0">{{ formatSignedMoney(data.resultado) }}</dd></div></dl>
+            </section>
+
+            <dl class="period-summary" aria-label="Totais do mês">
+              <div class="kpi kpi--income"><dt><span class="summary-dot income" aria-hidden="true"></span> Entradas</dt><dd>{{ formatMoney(data.entradas) }}</dd><p>Recebido neste mês</p></div>
+              <div class="kpi kpi--expense"><dt><span class="summary-dot expense" aria-hidden="true"></span> Saídas</dt><dd>{{ formatMoney(data.saidas) }}</dd><p>Pago neste mês</p></div>
+              <div class="period-result kpi kpi--result"><dt>Resultado do mês</dt><dd [class.positive]="data.resultado > 0" [class.negative]="data.resultado < 0">{{ formatSignedMoney(data.resultado) }}</dd><p>Entradas menos saídas</p></div>
+            </dl>
+
+            <section class="recent-section" aria-labelledby="recent-title">
+              <header class="section-heading">
+                <div><h2 id="recent-title">Últimos registros</h2><p>{{ data.quantidade }} {{ data.quantidade === 1 ? 'movimentação no mês' : 'movimentações no mês' }}{{ data.quantidade > 5 ? ' · mostrando as 5 mais recentes' : '' }}</p></div>
+                <a routerLink="/movimentacoes" [queryParams]="{ mes: monthKey }">Ver movimentações <span aria-hidden="true">↗</span></a>
+              </header>
+              @if (data.quantidade === 0) {
+                <div class="month-empty"><h3>Um mês sem registros, por enquanto.</h3><p>O saldo anterior permanece. Adicione uma movimentação quando houver algo a registrar.</p><a class="text-action" routerLink="/movimentacoes" [queryParams]="{ mes: monthKey, novo: '1' }">Adicionar registro</a></div>
+              } @else {
+                <ul class="recent-list">
+                  @for (movement of data.ultimasMovimentacoes; track movement.id) {
+                    <li>
+                      <time [attr.datetime]="movement.dataMovimentacao">{{ formatDate(movement.dataMovimentacao) }}</time>
+                      <span class="movement-sign" [class.income]="movement.tipo === 'ENTRADA'" aria-hidden="true">{{ movement.tipo === 'ENTRADA' ? '+' : '−' }}</span>
+                      <div class="movement-detail"><h3>{{ movement.descricao }}</h3><p>{{ movement.categoria }} · {{ movement.tipo === 'ENTRADA' ? 'Entrada' : 'Saída' }}</p></div>
+                      <strong [class.income]="movement.tipo === 'ENTRADA'">{{ movement.tipo === 'ENTRADA' ? '+' : '−' }} {{ formatMoney(movement.valor) }}</strong>
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+          }
+        }
+      </div>
+    </section>
+    <p class="page-footnote"><span>À TONA / SEU LIVRO-CAIXA</span> Apenas valores realizados. Previsões e agendamentos não estão incluídos.</p>
+  </div>
+</main>

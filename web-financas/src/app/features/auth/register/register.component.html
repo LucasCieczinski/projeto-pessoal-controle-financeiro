@@ -1,0 +1,126 @@
+<app-auth-shell>
+  <header class="heading">
+    <p class="eyebrow">UM PASSO DE CADA VEZ</p>
+    <h1>Crie sua conta.</h1>
+    <p>Comece com o básico. O resto a gente organiza depois.</p>
+  </header>
+
+  @if (errorMessage) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage }}</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label for="register-name">Como podemos chamar você?</label>
+      <div class="input">
+        <input
+          id="register-name"
+          type="text"
+          formControlName="nome"
+          autocomplete="name"
+          placeholder="Seu nome"
+          [attr.aria-invalid]="form.controls.nome.invalid && form.controls.nome.touched"
+          [attr.aria-describedby]="form.controls.nome.invalid && form.controls.nome.touched ? 'register-name-error' : null"
+        />
+      </div>
+      @if (form.controls.nome.invalid && form.controls.nome.touched) {
+        <p id="register-name-error" class="field-error">
+          {{ form.controls.nome.hasError('maxlength') ? 'Use no máximo 100 caracteres.' : 'Informe um nome com pelo menos 2 caracteres.' }}
+        </p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="register-email">E-mail</label>
+      <div class="input">
+        <input
+          id="register-email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="voce@email.com"
+          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+          [attr.aria-describedby]="form.controls.email.invalid && form.controls.email.touched ? 'register-email-error' : null"
+        />
+      </div>
+      @if (form.controls.email.invalid && form.controls.email.touched) {
+        <p id="register-email-error" class="field-error">
+          @if (form.controls.email.hasError('required')) {
+            Informe seu e-mail.
+          } @else if (form.controls.email.hasError('maxlength')) {
+            Use no máximo 100 caracteres.
+          } @else {
+            Digite um e-mail válido.
+          }
+        </p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="register-password">Senha</label>
+      <div class="input">
+        <input
+          id="register-password"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="senha"
+          autocomplete="new-password"
+          placeholder="De 8 a 72 caracteres"
+          [attr.aria-invalid]="form.controls.senha.invalid && form.controls.senha.touched"
+          [attr.aria-describedby]="form.controls.senha.invalid && form.controls.senha.touched ? 'register-password-error' : 'register-password-hint'"
+        />
+        <button
+          class="reveal"
+          type="button"
+          [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+          [attr.aria-pressed]="showPassword"
+          (click)="showPassword = !showPassword"
+        >
+          {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      @if (form.controls.senha.invalid && form.controls.senha.touched) {
+        <p id="register-password-error" class="field-error">
+          {{ form.controls.senha.hasError('required') ? 'Crie uma senha.' : 'Use entre 8 e 72 caracteres.' }}
+        </p>
+      } @else {
+        <p id="register-password-hint" class="field-hint">Use uma senha diferente das que você já usa.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="register-confirmation">Confirme sua senha</label>
+      <div class="input">
+        <input
+          id="register-confirmation"
+          [type]="showConfirmation ? 'text' : 'password'"
+          formControlName="confirmacaoSenha"
+          autocomplete="new-password"
+          placeholder="Digite a senha novamente"
+          [attr.aria-invalid]="form.controls.confirmacaoSenha.touched && (form.controls.confirmacaoSenha.invalid || form.hasError('passwordsDoNotMatch'))"
+          [attr.aria-describedby]="form.controls.confirmacaoSenha.touched && (form.controls.confirmacaoSenha.invalid || form.hasError('passwordsDoNotMatch')) ? 'register-confirmation-error' : null"
+        />
+        <button
+          class="reveal"
+          type="button"
+          [attr.aria-label]="showConfirmation ? 'Ocultar confirmação da senha' : 'Mostrar confirmação da senha'"
+          [attr.aria-pressed]="showConfirmation"
+          (click)="showConfirmation = !showConfirmation"
+        >
+          {{ showConfirmation ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      @if (form.controls.confirmacaoSenha.touched && (form.controls.confirmacaoSenha.invalid || form.hasError('passwordsDoNotMatch'))) {
+        <p id="register-confirmation-error" class="field-error">
+          {{ form.controls.confirmacaoSenha.hasError('required') ? 'Confirme sua senha.' : 'As senhas não coincidem.' }}
+        </p>
+      }
+    </div>
+
+    <button class="primary" type="submit" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Criando conta...' : 'Criar conta' }}
+      <span aria-hidden="true">→</span>
+    </button>
+  </form>
+
+  <p class="switch">Já tem conta? <a routerLink="/login">Entrar</a></p>
+</app-auth-shell>

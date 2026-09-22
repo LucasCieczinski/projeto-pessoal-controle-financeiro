@@ -1,0 +1,172 @@
+<main class="movements-page">
+  <div class="page-width">
+    <app-private-header (logoutRequested)="logout()" />
+
+    @if (sessionError) {
+      <p class="page-alert" role="alert">{{ sessionError }}</p>
+    }
+
+    <nav class="breadcrumbs" aria-label="Você está aqui">
+      <a routerLink="/inicio" [queryParams]="{ mes: monthKey }">Resumo</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Movimentações</span>
+    </nav>
+
+    <section class="page-intro" aria-labelledby="movements-title">
+      <div class="intro-copy">
+        <h1 id="movements-title">Movimentações</h1>
+        <p class="intro-lead">O que entrou. O que saiu. Tudo no seu lugar.</p>
+      </div>
+      <div class="intro-action">
+        <button #newMovementButton class="primary-action" type="button" (click)="openEditor()">
+          <span aria-hidden="true">+</span> Nova movimentação
+        </button>
+      </div>
+    </section>
+
+    @if (successMessage) {
+      <p class="success-alert" role="status">{{ successMessage }}</p>
+    }
+
+    <section class="ledger" aria-label="Movimentações por mês">
+      <app-period-navigation [label]="monthHeading" [month]="monthIndex + 1" [isCurrentMonth]="isCurrentMonth" (monthChanged)="changeMonth($event)" (currentMonthRequested)="goToCurrentMonth()" />
+      <div class="ledger-content">
+      @if (isLoading) {
+        <div class="state-panel loading-state" role="status">
+          <span class="loading-mark" aria-hidden="true"></span>
+          <p>Buscando seus registros...</p>
+        </div>
+      } @else if (loadError) {
+        <div class="state-panel error-state" role="alert">
+          <span class="state-symbol" aria-hidden="true">!</span>
+          <h3>Não foi possível carregar as movimentações</h3>
+          <p>{{ loadError }}</p>
+          <button type="button" class="text-action" (click)="loadMonth()">Tentar novamente <span aria-hidden="true">↗</span></button>
+        </div>
+      } @else if (movements.length === 0) {
+        <div class="state-panel empty-state">
+          <svg class="empty-illustration" viewBox="0 0 160 90" fill="none" aria-hidden="true"><path d="M20 8h110v72H20z" stroke="#c7bdca"/><path d="M40 8v72M20 32h110M20 48h110M20 64h110" stroke="#ddd4dc"/><path d="M51 22h34M51 41h20M96 41h21" stroke="#776780" stroke-width="2"/><circle cx="130" cy="65" r="17" fill="#efb39b"/><path d="M123 65h14M130 58v14" stroke="#25243b" stroke-width="2"/></svg>
+          <div class="empty-copy">
+            <h3>Nenhuma movimentação neste mês</h3>
+            <p>Do café ao salário: registre o que aconteceu em {{ monthLabel }}. Sua lista começa aqui.</p>
+            <button class="text-action" type="button" (click)="openEditor()">Adicionar primeiro registro</button>
+          </div>
+        </div>
+      } @else {
+        <dl class="period-summary" aria-label="Resumo do período">
+          <div><dt><span class="summary-dot income" aria-hidden="true"></span> Entradas</dt><dd>{{ formatMoney(totalFor('ENTRADA')) }}</dd></div>
+          <div><dt><span class="summary-dot expense" aria-hidden="true"></span> Saídas</dt><dd>{{ formatMoney(totalFor('SAIDA')) }}</dd></div>
+          <div class="period-result"><dt>Resultado do mês</dt><dd>{{ formatMoney(totalFor('ENTRADA') - totalFor('SAIDA')) }}</dd><span class="summary-hint">Entradas menos saídas</span></div>
+        </dl>
+        <div class="list-toolbar">
+          <p>{{ movements.length }} {{ movements.length === 1 ? 'registro no período' : 'registros no período' }}</p>
+          <div class="type-filters" role="group" aria-label="Filtrar movimentações">
+            <button type="button" [class.selected]="filter === 'TODAS'" [attr.aria-pressed]="filter === 'TODAS'" (click)="filter = 'TODAS'">Todas <span>{{ countFor('TODAS') }}</span></button>
+            <button type="button" [class.selected]="filter === 'ENTRADA'" [attr.aria-pressed]="filter === 'ENTRADA'" (click)="filter = 'ENTRADA'">Entradas <span>{{ countFor('ENTRADA') }}</span></button>
+            <button type="button" [class.selected]="filter === 'SAIDA'" [attr.aria-pressed]="filter === 'SAIDA'" (click)="filter = 'SAIDA'">Saídas <span>{{ countFor('SAIDA') }}</span></button>
+          </div>
+        </div>
+
+        @if (visibleMovements.length === 0) {
+          <div class="filter-empty">
+            <p>Nenhum registro deste tipo em {{ monthLabel }}.</p>
+            <button type="button" (click)="filter = 'TODAS'">Ver todos os registros</button>
+          </div>
+        } @else {
+          <div class="movement-list">
+            @for (group of groups; track group.date) {
+              <section class="date-group" [attr.aria-label]="group.label">
+                <h3>{{ group.label }}</h3>
+                @for (movement of group.items; track movement.id) {
+                  <article class="movement-row">
+                    <span class="movement-icon" [class.income]="movement.tipo === 'ENTRADA'" aria-hidden="true">{{ movement.tipo === 'ENTRADA' ? '+' : '−' }}</span>
+                    <div class="movement-detail">
+                      <h4>{{ movement.descricao }}</h4>
+                      <p>{{ movement.categoria }} <span aria-hidden="true">·</span> {{ movement.tipo === 'ENTRADA' ? 'Entrada' : 'Saída' }}</p>
+                    </div>
+                    <strong class="movement-amount" [class.income]="movement.tipo === 'ENTRADA'">{{ movement.tipo === 'ENTRADA' ? '+' : '−' }} {{ formatMoney(movement.valor) }}</strong>
+                    <div class="row-actions">
+                      <button type="button" [attr.aria-label]="'Editar ' + movement.descricao" (click)="openEditor(movement)">Editar</button>
+                      <button type="button" class="delete-action" [attr.aria-label]="'Excluir ' + movement.descricao" (click)="requestDelete(movement)">Excluir</button>
+                    </div>
+                  </article>
+                }
+              </section>
+            }
+          </div>
+        }
+      }
+      </div>
+    </section>
+
+    <p class="page-footnote"><span>À TONA / REGISTROS</span> Apenas valores realizados. Previsões e agendamentos não estão incluídos.</p>
+  </div>
+
+  <app-modal [(open)]="editorOpen" [title]="editingMovement ? 'Editar movimentação' : 'Nova movimentação'"
+    [description]="editingMovement ? 'Corrija os detalhes. Seus totais serão atualizados ao salvar.' : 'Registre uma entrada ou saída que já aconteceu.'"
+    [confirmLabel]="editingMovement ? 'Salvar alterações' : 'Salvar movimentação'" busyLabel="Salvando..." [busy]="isSaving"
+    submitForm="movement-form" (closed)="saveError = ''">
+      <form #movementForm id="movement-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <fieldset class="editor-fields" [disabled]="isSaving">
+        <fieldset class="type-choice">
+          <legend>Tipo de movimentação</legend>
+          <label [class.active]="form.controls.tipo.value === 'SAIDA'">
+            <input type="radio" formControlName="tipo" value="SAIDA" />
+            <span aria-hidden="true">↗</span> Saída
+          </label>
+          <label [class.active]="form.controls.tipo.value === 'ENTRADA'">
+            <input type="radio" formControlName="tipo" value="ENTRADA" />
+            <span aria-hidden="true">↙</span> Entrada
+          </label>
+        </fieldset>
+
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label for="movement-description">Descrição</label>
+            <input id="movement-description" modalInitialFocus formControlName="descricao" type="text" maxlength="255" placeholder="Ex.: Mercado do bairro" autocomplete="off" [attr.aria-invalid]="fieldInvalid('descricao')" [attr.aria-describedby]="fieldInvalid('descricao') ? 'description-error' : null" />
+            @if (fieldInvalid('descricao')) { <p class="field-error" id="description-error">Conte em poucas palavras o que aconteceu.</p> }
+          </div>
+
+          <div class="form-field">
+            <label for="movement-amount">Valor</label>
+            <div class="money-input"><span>R$</span><input id="movement-amount" formControlName="valor" type="text" inputmode="decimal" maxlength="18" placeholder="0,00" autocomplete="off" (blur)="formatAmountField()" [attr.aria-invalid]="fieldInvalid('valor')" [attr.aria-describedby]="fieldInvalid('valor') ? 'amount-error' : 'amount-hint'" /></div>
+            @if (fieldInvalid('valor')) { <p class="field-error" id="amount-error">Informe um valor maior que zero, como 58,90.</p> }
+            @else { <p class="field-hint" id="amount-hint">Use vírgula para os centavos.</p> }
+          </div>
+
+          <div class="form-field">
+            <label for="movement-date">Data</label>
+            <input id="movement-date" formControlName="dataMovimentacao" type="date" [max]="today" [attr.aria-invalid]="fieldInvalid('dataMovimentacao')" [attr.aria-describedby]="fieldInvalid('dataMovimentacao') ? 'date-error' : null" />
+            @if (fieldInvalid('dataMovimentacao')) { <p class="field-error" id="date-error">Escolha uma data válida, até hoje.</p> }
+          </div>
+
+          <div class="form-field full-width">
+            <label for="movement-category">Categoria</label>
+            <input id="movement-category" formControlName="categoria" type="text" maxlength="50" list="movement-categories" placeholder="Ex.: Alimentação" autocomplete="off" [attr.aria-invalid]="fieldInvalid('categoria')" [attr.aria-describedby]="fieldInvalid('categoria') ? 'category-error' : 'category-hint'" />
+            <datalist id="movement-categories">
+              @for (category of categorySuggestions; track category) { <option [value]="category"></option> }
+            </datalist>
+            @if (fieldInvalid('categoria')) { <p class="field-error" id="category-error">Dê um nome para esta categoria.</p> }
+            @else { <p class="field-hint" id="category-hint">Escolha uma sugestão ou escreva a sua.</p> }
+          </div>
+        </div>
+
+        </fieldset>
+        @if (saveError) { <p class="save-error" role="alert">{{ saveError }}</p> }
+      </form>
+  </app-modal>
+  <app-modal [(open)]="deleteOpen" title="Excluir movimentação?"
+    description="Este registro será removido e deixará de compor seus totais. Essa ação não pode ser desfeita."
+    confirmLabel="Excluir movimentação" cancelLabel="Manter registro" tone="danger"
+    busyLabel="Excluindo..." [busy]="isDeleting" (confirmed)="deleteMovement()">
+    @if (deletingMovement; as movement) {
+      <div class="delete-preview">
+        <p>{{ movement.tipo === 'ENTRADA' ? 'Entrada' : 'Saída' }} · {{ movement.categoria }}</p>
+        <h3>{{ movement.descricao }}</h3>
+        <strong>{{ formatMoney(movement.valor) }}</strong>
+        <p>Data: {{ movement.dataMovimentacao.slice(8, 10) }}/{{ movement.dataMovimentacao.slice(5, 7) }}/{{ movement.dataMovimentacao.slice(0, 4) }}</p>
+      </div>
+    }
+    @if (deleteError) { <p class="save-error" role="alert">{{ deleteError }}</p> }
+  </app-modal>
+</main>

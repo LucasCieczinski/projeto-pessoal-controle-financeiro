@@ -1,0 +1,44 @@
+:host { display: block; background: var(--ink); color: #f6efdf; }
+.period { position: relative; display: flex; flex-direction: column; min-height: 100%; padding: 30px 24px; }
+.period::before { position: absolute; right: 24px; top: 0; width: 17px; height: 13px; background: #ef9474; content: ''; }
+p { margin: 0 0 28px; font-size: 9px; letter-spacing: 1.4px; color: #cec6d9; }
+.folio { font-family: Georgia, serif; font-size: 64px; line-height: 1; letter-spacing: -3px; color: #e7def4; }
+h2 { margin: 15px 0 24px; max-width: 150px; font-size: 17px; line-height: 1.5; font-weight: 500; }
+.month-controls { display: flex; align-items: center; justify-content: space-between; border-block: 1px solid #575166; }
+button { min-width: 32px; min-height: 44px; padding: 0; border: 0; color: #f6efdf; background: transparent; font: inherit; cursor: pointer; }
+button:hover:not(:disabled) { color: #ffb599; }
+button:disabled { color: #a8a0b4; cursor: default; }
+.month-today { font-size: 11px; }
+.period-signature { display: grid; gap: 15px; margin-top: auto; padding-top: 50px; color: #8e859f; }
+svg { width: 75px; height: 40px; }
+.period-signature span { font-size: 8px; letter-spacing: 1px; color: #cec6d9; }
+.period--toolbar { flex-direction: row; align-items: center; min-height: 76px; padding: 15px 20px; color: #25243b; background: #fff; }
+.period--toolbar::before { right: 0; top: 0; width: 100%; height: 3px; background: #efb39b; }
+.period--toolbar .period-label { display: flex; align-items: baseline; gap: 14px; }
+.period--toolbar .period-label p { margin: 0; color: #74788a; font-size: 9px; }
+.period--toolbar .folio { display: none; }
+.period--toolbar h2 { margin: 0; max-width: none; font: 600 15px 'Segoe UI', Arial, sans-serif; }
+.period--toolbar .month-controls { min-width: 205px; margin-left: auto; border: 1px solid #d9deea; border-radius: 8px; color: #25243b; }
+.period--toolbar button { min-height: 40px; color: #25243b; }
+.period--toolbar button:hover:not(:disabled) { color: #25243b; background: #f1edf6; }
+.period--toolbar .month-today { border-inline: 1px solid #d9deea; font-weight: 600; }
+.period--toolbar .period-signature { display: none; }
+@media (max-width: 760px) {
+  .period { flex-direction: row; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 24px; }
+  .period-label { display: grid; grid-template-columns: auto 1fr; column-gap: 16px; align-items: center; }
+  p { grid-column: 2; margin: 0 0 4px; font-size: 8px; }
+  .folio { grid-column: 1; grid-row: 1 / 3; font-size: 42px; }
+  h2 { margin: 0; font-size: 14px; max-width: none; }
+  .month-controls { gap: 12px; }
+  .period-signature { display: none; }
+}
+@media (max-width: 520px) {
+  .period { align-items: stretch; flex-direction: column; gap: 16px; padding: 20px; }
+  .period-label { grid-template-columns: auto 1fr; }
+  .month-controls { justify-content: space-between; }
+}
+@media (max-width: 600px) {
+  .period--toolbar { align-items: stretch; flex-direction: column; gap: 12px; padding: 16px; }
+  .period--toolbar .period-label { justify-content: space-between; }
+  .period--toolbar .month-controls { width: 100%; margin: 0; }
+}

@@ -1,0 +1,33 @@
+<dialog #dialog class="modal" [class.modal--drawer]="variant() === 'drawer'" [class.modal--wide]="size() === 'wide'"
+  [attr.aria-labelledby]="titleId" [attr.aria-describedby]="description() ? descriptionId : null"
+  (cancel)="onCancel($event)" (close)="onNativeClose()" (pointerdown)="onPointerDown($event)" (click)="onClick($event)">
+  <header class="modal-header">
+    <div class="heading">
+      <h2 [id]="titleId" tabindex="-1" autofocus>{{ title() }}</h2>
+      @if (description()) { <p [id]="descriptionId">{{ description() }}</p> }
+    </div>
+    @if (dismissible()) {
+      <button class="close-action" type="button" aria-label="Fechar modal" [disabled]="busy()" (click)="requestClose('close-button')">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+      </button>
+    }
+  </header>
+  <div class="modal-body" [attr.aria-busy]="busy()"><ng-content /></div>
+  @if (confirmLabel() || (cancelLabel() && dismissible())) {
+    <footer class="modal-footer">
+      <span class="busy-status" role="status">{{ busy() ? busyLabel() : '' }}</span>
+      <div class="modal-actions">
+        @if (cancelLabel() && dismissible()) {
+          <button class="secondary-action" type="button" [disabled]="busy()" (click)="requestClose('cancel')">{{ cancelLabel() }}</button>
+        }
+        @if (confirmLabel()) {
+          <button class="confirm-action" [class.confirm-action--danger]="tone() === 'danger'" [type]="submitForm() ? 'submit' : 'button'" [attr.form]="submitForm() || null"
+            [disabled]="busy() || confirmDisabled()" (click)="confirm()">
+            @if (busy()) { <span class="spinner" aria-hidden="true"></span> }
+            {{ busy() ? busyLabel() : confirmLabel() }}
+          </button>
+        }
+      </div>
+    </footer>
+  }
+</dialog>

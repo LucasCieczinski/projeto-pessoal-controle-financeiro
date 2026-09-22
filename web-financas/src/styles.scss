@@ -1,0 +1,62 @@
+:root {
+  --ink: #25243b;
+  --ink-soft: #55566b;
+  --paper: #f8f4eb;
+  --paper-deep: #eee7da;
+  --line: #d9d2c6;
+  --coral: #d9654f;
+  --coral-light: #ffe1d3;
+  --violet: #ded9f7;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  color: var(--ink);
+  background: var(--paper);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--ink);
+  background: #ffd3c1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

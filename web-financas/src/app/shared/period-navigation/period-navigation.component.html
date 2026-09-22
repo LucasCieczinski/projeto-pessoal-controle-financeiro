@@ -1,0 +1,16 @@
+<div class="period" [class.period--toolbar]="variant() === 'toolbar'">
+  <div class="period-label">
+    <p>MÊS DE REFERÊNCIA</p>
+    <span class="folio" aria-hidden="true">{{ month().toString().padStart(2, '0') }}</span>
+    <h2 aria-live="polite">{{ label() }}</h2>
+  </div>
+  <nav class="month-controls" aria-label="Escolher mês">
+    <button type="button" (click)="monthChanged.emit(-1)" aria-label="Mês anterior">←</button>
+    <button type="button" class="month-today" (click)="currentMonthRequested.emit()" [disabled]="isCurrentMonth()">Este mês</button>
+    <button type="button" (click)="monthChanged.emit(1)" [disabled]="isCurrentMonth()" aria-label="Próximo mês">→</button>
+  </nav>
+  <div class="period-signature" aria-hidden="true">
+    <svg viewBox="0 0 90 48" fill="none"><path d="M3 44V19a8 8 0 0 1 8-8h34a17 17 0 0 1 17 17v16M23 44V28a9 9 0 0 1 18 0v16" stroke="currentColor" stroke-width="2"/><circle cx="66" cy="9" r="5" fill="#ef9474"/><path d="M0 47h90" stroke="currentColor"/></svg>
+    <span>O SEU DINHEIRO, À TONA.</span>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:financeiro_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  flyway:
+    enabled: false
+
+jwt:
+  # Test-only key. It has no value outside the in-memory test context.
+  secret: dGVzdC1vbmx5LXNlY3JldC1mb3Itand0LXRlc3RzLTEyMzQ1Njc4OTA=
+  expiration: 3600000
+
+app:
+  cors:
+    allowed-origins: http://localhost:4200

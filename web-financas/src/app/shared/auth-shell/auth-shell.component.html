@@ -1,0 +1,28 @@
+<main class="auth-page">
+  <aside class="story-panel" aria-label="Sobre o projeto À Tona">
+    <a class="brand" routerLink="/" aria-label="À Tona, voltar à página inicial">
+      <img src="brand-mark.svg" alt="" width="43" height="43" />
+      <span>à tona<span class="brand-accent">.</span></span>
+    </a>
+
+    <div class="story-content">
+      <p class="eyebrow">FINANÇAS PARA A VIDA COMO ELA É</p>
+      <p class="story-title">Dinheiro é assunto de <em>gente.</em></p>
+      <p class="story-lead">Um espaço para olhar seu mês com mais clareza, no seu ritmo e sem julgamento.</p>
+      <div class="story-note"><span class="note-label">O NOSSO JEITO</span><p>anotar <span>→</span> entender <span>→</span> escolher</p></div>
+    </div>
+
+    <small>À TONA <span aria-hidden="true">✳</span> UM MÊS DE CADA VEZ</small>
+  </aside>
+
+  <section class="form-panel" aria-label="Acesso à conta">
+    <div class="form-content">
+      <a class="brand brand--mobile" routerLink="/" aria-label="À Tona, voltar à página inicial">
+        <img src="brand-mark.svg" alt="" width="38" height="38" />
+        <span>à tona<span class="brand-accent">.</span></span>
+      </a>
+      <a class="back-link" routerLink="/">← Voltar ao site</a>
+      <ng-content />
+    </div>
+  </section>
+</main>

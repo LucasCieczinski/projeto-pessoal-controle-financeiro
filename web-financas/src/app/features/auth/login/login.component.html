@@ -1,0 +1,76 @@
+<app-auth-shell>
+  <header class="heading">
+    <p class="eyebrow">QUE BOM TER VOCÊ DE VOLTA</p>
+    <h1>Entre na sua conta.</h1>
+    <p>Vamos continuar de onde você parou.</p>
+  </header>
+
+  @if (successMessage) {
+    <p class="feedback feedback--success" role="status">{{ successMessage }}</p>
+  }
+  @if (errorMessage) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage }}</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label for="login-email">E-mail</label>
+      <div class="input">
+        <input
+          id="login-email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="voce@email.com"
+          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+          [attr.aria-describedby]="form.controls.email.invalid && form.controls.email.touched ? 'login-email-error' : null"
+        />
+      </div>
+      @if (form.controls.email.invalid && form.controls.email.touched) {
+        <p id="login-email-error" class="field-error">
+          {{ form.controls.email.hasError('required') ? 'Informe seu e-mail.' : 'Digite um e-mail válido.' }}
+        </p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="login-password">Senha</label>
+      <div class="input">
+        <input
+          id="login-password"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="senha"
+          autocomplete="current-password"
+          placeholder="Sua senha"
+          [attr.aria-invalid]="form.controls.senha.invalid && form.controls.senha.touched"
+          [attr.aria-describedby]="form.controls.senha.invalid && form.controls.senha.touched ? 'login-password-error' : null"
+        />
+        <button
+          class="reveal"
+          type="button"
+          [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+          [attr.aria-pressed]="showPassword"
+          (click)="showPassword = !showPassword"
+        >
+          {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      @if (form.controls.senha.invalid && form.controls.senha.touched) {
+        <p id="login-password-error" class="field-error">Informe sua senha.</p>
+      }
+    </div>
+
+    <label class="check" for="remember-me">
+      <input id="remember-me" type="checkbox" formControlName="lembrar" />
+      <span>Continuar conectado neste navegador</span>
+    </label>
+    <p class="check-hint">Evite esta opção em computadores compartilhados.</p>
+
+    <button class="primary" type="submit" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
+      <span aria-hidden="true">→</span>
+    </button>
+  </form>
+
+  <p class="switch">Ainda não tem conta? <a routerLink="/cadastro">Criar conta</a></p>
+</app-auth-shell>
