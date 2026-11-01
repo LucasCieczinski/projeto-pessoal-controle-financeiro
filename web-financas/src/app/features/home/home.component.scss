@@ -1,3 +1,5 @@
+@use '../../shared/page-shell' as shell;
+
 .page-width { padding-bottom: 48px; }
 h1, h2, h3, p { margin: 0; }
 a { color: inherit; }
@@ -52,10 +54,7 @@ button { font: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .loading-mark { animation: none; } }
 
 /* Resumo inspirado em um painel bancário: dados essenciais primeiro, sem simular saldo bancário. */
-@media (min-width: 901px) {
-  .page-width { width: min(1440px, calc(100% - 120px)); margin: 0 40px 0 100px; transition: width 180ms ease, margin-left 180ms ease; }
-  :host-context(body.sidebar-expanded) .page-width { width: min(1440px, calc(100% - 320px)); margin-left: 280px; }
-}
+@include shell.authenticated-page();
 
 :host { background: #f4f6fa; --border: #e0e5ee; --muted: #687087; }
 .breadcrumbs { display: none; }

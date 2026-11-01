@@ -1,0 +1,22 @@
+# Perfil de produção (Onda 1 — hardening de segurança).
+#
+# Ative com SPRING_PROFILES_ACTIVE=prod. Diferente do perfil padrão, aqui os
+# defaults são seguros: a aplicação falha ao subir se configurações críticas
+# não forem informadas, em vez de cair silenciosamente em valores de
+# desenvolvimento (localhost e cookies sem HTTPS).
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    # Um banco de produção não deve ser "baselinado" automaticamente.
+    baseline-on-migrate: false
+
+app:
+  auth:
+    # Cookies de sessão somente via HTTPS. Pode ser sobrescrito por COOKIE_SECURE.
+    cookie-secure: ${COOKIE_SECURE:true}
+  cors:
+    # Sem default: exige a(s) origem(ns) reais do front-end, separadas por vírgula.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}

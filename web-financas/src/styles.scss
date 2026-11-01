@@ -60,3 +60,28 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (max-width: 620px) {
+  /* Espaço para a barra de navegação inferior fixa da área autenticada
+     (a classe é alternada pelo PrivateHeaderComponent). */
+  body.has-bottom-nav {
+    padding-bottom: 66px;
+  }
+}
+
+@media (min-width: 901px) {
+  /* Medidas da sidebar fixa da área autenticada: fonte única. O próprio
+     componente lê --sidebar-w para a largura da barra e cada página reserva
+     --sidebar-w + --sidebar-gap à esquerda do conteúdo (mixin
+     shared/_page-shell.scss). Ao expandir, o serviço marca o body com
+     .sidebar-expanded e as duas medidas crescem juntas, mantendo a animação. */
+  :root {
+    --sidebar-w: 76px;
+    --sidebar-gap: 24px;
+  }
+
+  body.sidebar-expanded {
+    --sidebar-w: 248px;
+    --sidebar-gap: 32px;
+  }
+}

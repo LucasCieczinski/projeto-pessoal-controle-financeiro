@@ -1,6 +1,6 @@
 <main class="movements-page">
   <div class="page-width">
-    <app-private-header (logoutRequested)="logout()" />
+    <app-private-header [context]="monthHeading" (logoutRequested)="logout()" />
 
     @if (sessionError) {
       <p class="page-alert" role="alert">{{ sessionError }}</p>

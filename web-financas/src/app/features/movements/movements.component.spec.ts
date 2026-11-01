@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
 import { of, Subject } from 'rxjs';
 import { vi } from 'vitest';
 import { CreateMovementRequest, Movement } from '../../core/movements/movement.models';
@@ -209,6 +210,30 @@ describe('MovementsComponent', () => {
     fixture.detectChanges();
     expect(page.textContent).toContain('Salário');
     expect(page.textContent).not.toContain('Mercado');
+  });
+
+  it('abre o editor pelo atalho da navbar mesmo já estando em movimentações', async () => {
+    await TestBed.configureTestingModule({
+      providers: [
+        provideRouter([{ path: 'movimentacoes', component: MovementsComponent }]),
+        { provide: MovementService, useValue: { forMonth: () => of([]) } },
+        { provide: AuthService, useValue: {} },
+      ],
+    }).compileComponents();
+
+    const harness = await RouterTestingHarness.create();
+    const component = await harness.navigateByUrl('/movimentacoes', MovementsComponent);
+    const page = harness.routeNativeElement as HTMLElement;
+    stubDialogs(page);
+    expect(component.editorOpen()).toBe(false);
+
+    const router = TestBed.inject(Router);
+    await router.navigate([], { queryParams: { novo: '1' } });
+    await harness.fixture.whenStable();
+
+    expect(component.editorOpen()).toBe(true);
+    // O parâmetro é consumido para não reabrir o editor em futuras navegações.
+    expect(router.routerState.snapshot.root.queryParams['novo']).toBeUndefined();
   });
 });
 

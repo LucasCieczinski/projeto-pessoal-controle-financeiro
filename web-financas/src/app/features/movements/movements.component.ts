@@ -102,10 +102,16 @@ export class MovementsComponent implements OnInit {
       this.monthIndex = number - 1;
     }
     this.loadMonth();
-    if (this.route.snapshot.queryParamMap.get('novo') === '1') {
-      this.openEditor();
-      void this.router.navigate([], { relativeTo: this.route, queryParams: { novo: null }, queryParamsHandling: 'merge', replaceUrl: true });
-    }
+    // Observa `novo=1` continuamente: ao clicar no atalho da navbar ou na barra
+    // inferior já estando em /movimentacoes o componente não é recriado, então a
+    // leitura precisa reagir à mudança de query params (não apenas no OnInit).
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params.get('novo') !== '1') return;
+        this.openEditor();
+        void this.router.navigate([], { relativeTo: this.route, queryParams: { novo: null }, queryParamsHandling: 'merge', replaceUrl: true });
+      });
   }
 
   get monthKey(): string {

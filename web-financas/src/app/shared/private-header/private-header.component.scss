@@ -2,6 +2,7 @@
   display: block;
 }
 
+// ---- Estrutura base (todas as larguras) ----
 .site-header {
   display: flex;
   align-items: center;
@@ -34,6 +35,7 @@
   color: var(--coral);
 }
 
+// Faixa horizontal de navegação (tablet e desktop estreito).
 .private-nav {
   display: flex;
   align-self: stretch;
@@ -82,23 +84,103 @@
   background: #eee8e9;
 }
 
-.logout-short {
+// Ícones: traço arredondado herdando a cor do texto em qualquer breakpoint.
+.menu-toggle svg,
+.private-nav svg,
+.logout svg,
+.quick-action svg,
+.upcoming-item svg,
+.mobile-account svg,
+.bottom-nav svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+}
+
+.menu-toggle svg,
+.private-nav svg,
+.upcoming-item svg,
+.mobile-account svg,
+.bottom-nav svg {
+  stroke-linejoin: round;
+}
+
+// Elementos da navbar reformulada: ocultos fora de seu breakpoint. O botão de
+// recolher existe só no desktop, onde a navegação vira a barra lateral.
+.menu-toggle,
+.quick-actions,
+.upcoming-links,
+.header-context,
+.mobile-avatar,
+.mobile-account,
+.bottom-nav {
   display: none;
 }
 
-@media (max-width: 620px) {
+// ---- Tablet (621px - 900px): faixa horizontal compacta ----
+@media (min-width: 621px) and (max-width: 900px) {
   .site-header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0 16px;
-    min-height: 0;
-    padding-top: 15px;
+    min-height: 72px;
+  }
+
+  .private-nav {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .private-nav p,
+  .private-nav svg,
+  .account-area > span,
+  .account-area > div {
+    display: none;
+  }
+
+  .account-area {
+    margin-left: 10px;
+  }
+
+  .logout {
+    min-width: 40px;
+    padding: 0 10px;
+  }
+
+  .logout span {
+    display: none;
+  }
+
+  .logout svg {
+    width: 17px;
+    height: 17px;
+    stroke-width: 1.7;
+  }
+}
+
+// ---- Desktop (>= 901px): barra lateral fixa ----
+// O estado recolhido é a BASE e todas as variações do expandido vêm depois.
+// Assim a cascata não deixa largura/fonte do expandido vazarem para o recolhido.
+@media (min-width: 901px) {
+  .site-header {
+    position: fixed;
+    z-index: 20;
+    inset: 0 auto 0 0;
+    flex-direction: column;
+    align-items: stretch;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #414b6b transparent;
+    width: var(--sidebar-w);
+    padding: 22px 12px 18px;
+    transition: width 180ms ease, padding 180ms ease;
+    color: #edf0fb;
+    background: #202642;
+    border: 0;
+    border-right: 1px solid #323957;
   }
 
   .brand {
-    grid-column: 1;
-    grid-row: 1;
-    font-size: 22px;
+    justify-content: center;
+    padding: 0;
   }
 
   .brand img {
@@ -106,104 +188,494 @@
     height: 36px;
   }
 
-  .logout {
-    grid-column: 2;
-    grid-row: 1;
-    min-height: 37px;
-    padding: 0 12px;
-    font-size: 12px;
+  .brand > span {
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    transition: width 160ms ease, opacity 120ms ease;
   }
 
-  .logout-full {
-    display: none;
+  .brand-accent {
+    color: #efb39b;
   }
 
-  .logout-short {
-    display: inline;
+  // Ação de recolher/expandir: botão fantasma no mesmo idioma visual dos links
+  // de navegação (fundo aparece só no hover) e centralizada no trilho de ícones.
+  .menu-toggle {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    margin: 24px auto 0;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    color: #cbd1e7;
+    background: transparent;
+    cursor: pointer;
+    transition: color 150ms ease, background 150ms ease;
+  }
+
+  .menu-toggle:hover {
+    color: #fff;
+    background: #2c3456;
+  }
+
+  .menu-toggle svg {
+    width: 19px;
+    height: 19px;
+    stroke-width: 1.8;
   }
 
   .private-nav {
+    display: grid;
+    align-self: auto;
+    gap: 5px;
+    margin: 34px 0 0;
+  }
+
+  .private-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-height: 46px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    color: #cbd1e7;
+    font-size: 0;
+  }
+
+  .private-nav a:hover {
+    color: #fff;
+    background: #2c3456;
+  }
+
+  .private-nav a.active {
+    color: #25243b;
+    background: #f4bb9f;
+    box-shadow: 0 5px 18px #11162b35;
+  }
+
+  .private-nav a svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .private-nav svg,
+  .logout svg {
+    width: 19px;
+    height: 19px;
+    flex: none;
+    stroke-width: 1.7;
+  }
+
+  // Recolhido: rótulo sem altura e sem transição — nada de texto cortado na animação.
+  .nav-label {
+    height: 0;
+    overflow: hidden;
+    margin: 0;
+    opacity: 0;
+    transition: none;
+    color: #aeb7d5;
+    font: 700 10px/1.3 'Segoe UI', Arial, sans-serif;
+    letter-spacing: 1.15px;
+  }
+
+  .quick-actions,
+  .upcoming-links {
+    display: grid;
+  }
+
+  .quick-actions {
+    gap: 6px;
+    margin-top: 18px;
+  }
+
+  .upcoming-links {
+    gap: 5px;
+    margin-top: 16px;
+  }
+
+  .quick-action,
+  .upcoming-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0;
+    border-radius: 8px;
+    font-size: 0;
+  }
+
+  .quick-action {
+    color: #fff;
+    background: var(--coral);
+    text-decoration: none;
+    box-shadow: 0 5px 18px #11162b35;
+    transition: background 150ms ease, transform 150ms ease;
+  }
+
+  .quick-action:hover {
+    background: #c25540;
+    transform: translateY(-1px);
+  }
+
+  .quick-action svg {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    stroke-width: 2.2;
+  }
+
+  .upcoming-item {
+    color: #8b93b3;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .upcoming-item svg {
+    width: 19px;
+    height: 19px;
+    flex: none;
+    stroke-width: 1.7;
+  }
+
+  .upcoming-badge {
+    display: none;
+  }
+
+  .account-area {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 10px;
+    align-items: center;
+    margin-top: auto;
+    padding: 14px 0 0;
+    border-top: 1px solid #38405d;
+  }
+
+  .account-mark {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 50%;
+    color: #1e2541;
+    background: #d9d1e9;
+    font: 700 14px Georgia, serif;
+  }
+
+  .account-area strong,
+  .account-area div span {
+    display: block;
+  }
+
+  .account-area strong {
+    color: #f6f7fc;
+    font-size: 12px;
+  }
+
+  .account-area div span {
+    margin-top: 3px;
+    color: #aeb7d5;
+    font-size: 10px;
+  }
+
+  .account-area > div,
+  .account-area .logout {
+    display: none;
+  }
+
+  // ---- Estado expandido: sobrescreve a base recolhida ----
+  // A largura não aparece aqui: vem de --sidebar-w (styles.scss), a mesma
+  // medida que as páginas leem para recuar o conteúdo.
+  .sidebar--expanded {
+    padding: 28px 16px 20px;
+  }
+
+  .sidebar--expanded .brand {
+    justify-content: flex-start;
+    padding: 0 10px;
+    color: #fff;
+  }
+
+  .sidebar--expanded .brand > span {
+    width: 94px;
+    opacity: 1;
+  }
+
+  // Expandido, a ação sobe para a linha da marca (padrão de cabeçalho de
+  // sidebar) e se alinha aos limites do logo/texto: 26px = padding 16 + 10.
+  .sidebar--expanded .menu-toggle {
+    position: absolute;
+    top: 26px;
+    right: 26px;
+    margin: 0;
+  }
+
+  .sidebar--expanded .private-nav {
+    margin-top: 30px;
+  }
+
+  .sidebar--expanded .private-nav a {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  .sidebar--expanded .nav-label {
+    height: auto;
+    margin: 0 10px 9px;
+    opacity: 1;
+    transition: opacity 120ms ease;
+  }
+
+  .sidebar--expanded .quick-actions {
+    margin-top: 34px;
+  }
+
+  .sidebar--expanded .upcoming-links {
+    margin-top: 22px;
+  }
+
+  .sidebar--expanded .quick-action,
+  .sidebar--expanded .upcoming-item {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  .sidebar--expanded .upcoming-badge {
+    display: inline-block;
+    margin-left: auto;
+    padding: 2px 7px;
+    border-radius: 999px;
+    color: #aeb7d5;
+    background: #303957;
+    font: 700 9px/1.4 'Segoe UI', Arial, sans-serif;
+    font-style: normal;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .sidebar--expanded .account-area {
+    grid-template-columns: 34px 1fr;
+    justify-items: stretch;
+    padding-inline: 10px;
+  }
+
+  .sidebar--expanded .account-area > div,
+  .sidebar--expanded .account-area .logout {
+    display: block;
+  }
+
+  .sidebar--expanded .logout {
+    display: inline-flex;
     grid-column: 1 / -1;
-    grid-row: 2;
-    gap: 24px;
-    margin: 9px 0 0;
-    min-height: 47px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    margin-top: 4px;
+    padding: 0;
+    border: 1px solid #4a5372;
+    border-radius: 7px;
+    color: #dce1f1;
+    background: transparent;
+    font: 600 12px 'Segoe UI', Arial, sans-serif;
+  }
+
+  .sidebar--expanded .logout:hover {
+    color: #fff;
+    background: #303957;
+  }
+
+  .sidebar--expanded .logout svg {
+    width: 16px;
+    height: 16px;
   }
 }
 
-/* A barra inicia compacta; o conteúdo textual aparece somente quando expandida. */
-@media (min-width: 901px) {
-  .site-header { width: 76px; padding: 22px 12px 18px; transition: width 180ms ease, padding 180ms ease; }
-  .site-header.sidebar--expanded { width: 248px; padding: 28px 16px 20px; }
-  .brand { justify-content: center; padding: 0; }
-  .brand > span { width: 0; overflow: hidden; opacity: 0; white-space: nowrap; transition: width 160ms ease, opacity 120ms ease; }
-  .sidebar--expanded .brand { justify-content: flex-start; padding: 0 10px; }
-  .sidebar--expanded .brand > span { width: 94px; opacity: 1; }
-  .menu-toggle { display: grid; width: 40px; height: 40px; place-items: center; margin: 30px auto 0; padding: 0; border: 1px solid #46506f; border-radius: 8px; color: #dce1f1; background: transparent; cursor: pointer; }
-  .menu-toggle:hover { color: #fff; background: #303957; }
-  .menu-toggle svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 1.8; }
-  .private-nav { margin-top: 34px; }
-  .private-nav p { height: 12px; overflow: hidden; margin-inline: 0; opacity: 0; white-space: nowrap; transition: opacity 120ms ease; }
-  .private-nav a { justify-content: center; gap: 0; padding: 0; font-size: 0; }
-  .private-nav a svg { width: 21px; height: 21px; }
-  .sidebar--expanded .menu-toggle { margin: 28px 10px 0 auto; }
-  .sidebar--expanded .private-nav { margin-top: 30px; }
-  .sidebar--expanded .private-nav p { height: auto; margin: 0 10px 9px; opacity: 1; }
-  .sidebar--expanded .private-nav a { justify-content: flex-start; gap: 12px; padding: 0 12px; font-size: 14px; }
-  .account-area { grid-template-columns: 1fr; justify-items: center; padding-inline: 0; }
-  .account-area > div, .account-area .logout { display: none; }
-  .sidebar--expanded .account-area { grid-template-columns: 34px 1fr; justify-items: stretch; padding-inline: 10px; }
-  .sidebar--expanded .account-area > div, .sidebar--expanded .account-area .logout { display: block; }
-  .sidebar--expanded .logout { display: inline-flex; grid-column: 1 / -1; }
-}
-
-@media (max-width: 900px) {
-  .menu-toggle { display: none; }
-}
-
-/* Navegação principal da área autenticada: barra lateral em telas amplas. */
-@media (min-width: 901px) {
-  .site-header { position: fixed; z-index: 20; inset: 0 auto 0 0; flex-direction: column; align-items: stretch; width: 248px; padding: 28px 16px 20px; color: #edf0fb; background: #202642; border: 0; border-right: 1px solid #323957; }
-  .brand { padding: 0 10px; color: #fff; }
-  .brand img { width: 36px; height: 36px; }
-  .brand-accent { color: #efb39b; }
-  .private-nav { display: grid; align-self: auto; gap: 5px; margin: 48px 0 0; }
-  .private-nav p { margin: 0 10px 9px; color: #aeb7d5; font: 700 10px/1.3 'Segoe UI', Arial, sans-serif; letter-spacing: 1.15px; }
-  .private-nav a { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 12px; border: 0; border-radius: 8px; color: #cbd1e7; font-size: 14px; }
-  .private-nav a:hover { color: #fff; background: #2c3456; }
-  .private-nav a.active { color: #25243b; background: #f4bb9f; box-shadow: 0 5px 18px #11162b35; }
-  .private-nav svg, .logout svg { width: 19px; height: 19px; flex: none; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
-  .account-area { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; margin-top: auto; padding: 14px 10px 0; border-top: 1px solid #38405d; }
-  .account-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: #1e2541; background: #d9d1e9; font: 700 14px Georgia, serif; }
-  .account-area strong, .account-area div span { display: block; }
-  .account-area strong { color: #f6f7fc; font-size: 12px; }
-  .account-area div span { margin-top: 3px; color: #aeb7d5; font-size: 10px; }
-  .logout { grid-column: 1 / -1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; margin-top: 4px; padding: 0; border: 1px solid #4a5372; border-radius: 7px; color: #dce1f1; background: transparent; font: 600 12px 'Segoe UI', Arial, sans-serif; }
-  .logout:hover { color: #fff; background: #303957; }
-  .logout svg { width: 16px; height: 16px; }
-}
-
-@media (min-width: 621px) and (max-width: 900px) {
-  .site-header { min-height: 72px; }
-  .private-nav { margin-left: auto; margin-right: 0; }
-  .private-nav p, .private-nav svg, .account-area > span, .account-area > div { display: none; }
-  .account-area { margin-left: 10px; }
-  .logout { min-width: 40px; padding: 0 10px; }
-  .logout span { display: none; }
-  .logout svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
-}
-
+// ---- Mobile (<= 620px): cabeçalho compacto + bottom navigation ----
 @media (max-width: 620px) {
-  .site-header { display: flex; align-items: center; gap: 8px; min-height: 64px; padding: 14px 0; }
-  .brand { font-size: 21px; }
-  .brand img { width: 32px; height: 32px; }
-  .private-nav { display: flex; align-items: center; gap: 2px; min-height: 0; margin: 0 0 0 auto; }
-  .private-nav p, .private-nav svg { display: none; }
-  .private-nav a { min-height: 36px; padding: 0 7px; border: 0; border-radius: 6px; color: #5e6477; font-size: 11px; }
-  .private-nav a.active { color: var(--ink); background: #ece8f2; }
-  .account-area { display: block; margin: 0 0 0 2px; padding: 0; border: 0; }
-  .account-area > span, .account-area > div { display: none; }
-  .account-area .logout { display: inline-grid; width: 36px; min-width: 36px; min-height: 36px; margin: 0; padding: 0; place-items: center; color: var(--ink); border-color: #cbd1df; }
-  .logout span { display: none; }
-  .logout svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  .site-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 64px;
+    padding: 14px 0;
+  }
+
+  .brand {
+    font-size: 21px;
+  }
+
+  .brand img {
+    width: 32px;
+    height: 32px;
+  }
+
+  // A navegação horizontal e a área da conta saem de cena: a bottom nav assume.
+  .private-nav,
+  .account-area {
+    display: none;
+  }
+
+  .header-context {
+    display: block;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .mobile-avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid #cbd1df;
+    border-radius: 50%;
+    color: var(--ink);
+    background: var(--violet);
+    cursor: pointer;
+    font: 700 14px Georgia, serif;
+  }
+
+  .mobile-avatar[aria-expanded='true'] {
+    border-color: var(--coral);
+    background: var(--coral-light);
+  }
+
+  .mobile-account {
+    display: grid;
+    gap: 10px;
+    position: fixed;
+    top: 70px;
+    right: 10px;
+    z-index: 40;
+    min-width: 195px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 14px 34px #11162b24;
+  }
+
+  .mobile-account p {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+  }
+
+  .mobile-account p strong {
+    font-size: 12px;
+  }
+
+  .mobile-account p span {
+    color: var(--ink-soft);
+    font-size: 10px;
+  }
+
+  .mobile-account .logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    color: var(--ink);
+    background: transparent;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .mobile-account .logout:hover {
+    background: #eee8e9;
+  }
+
+  .mobile-account .logout svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.7;
+  }
+
+  .bottom-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto 1fr;
+    align-items: center;
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 30;
+    padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #e1dee7;
+    background: #fff;
+    box-shadow: 0 -8px 26px #11162b14;
+  }
+
+  .bottom-nav a,
+  .bottom-nav button {
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    min-height: 48px;
+    padding: 4px 2px;
+    border: 0;
+    border-radius: 8px;
+    color: #5e6477;
+    background: transparent;
+    font-size: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .bottom-nav a svg,
+  .bottom-nav button svg {
+    width: 21px;
+    height: 21px;
+    stroke-width: 1.7;
+  }
+
+  .bottom-nav a.active,
+  .bottom-nav .bottom-nav__more.active {
+    color: var(--ink);
+    background: var(--coral-light);
+  }
+
+  .bottom-nav .bottom-nav__add {
+    width: 54px;
+    min-height: 44px;
+    margin: 0 8px;
+    color: #fff;
+    background: var(--coral);
+    border-radius: 999px;
+    box-shadow: 0 6px 16px #d9654f59;
+  }
+
+  .bottom-nav .bottom-nav__add svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.2;
+  }
+
+  .bottom-nav .bottom-nav__more svg circle {
+    fill: currentColor;
+    stroke: none;
+  }
 }

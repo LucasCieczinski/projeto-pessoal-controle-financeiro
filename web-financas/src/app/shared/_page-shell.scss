@@ -1,0 +1,27 @@
+// Layout das páginas autenticadas (desktop).
+//
+// A sidebar fixa flutua sobre a página, então cada página reserva o espaço dela
+// e centraliza a própria coluna de conteúdo na área que sobra. As medidas da
+// sidebar vivem no styles.scss (--sidebar-w / --sidebar-gap) para que a barra e
+// o deslocamento do conteúdo mudem sempre juntos — inclusive ao recolher a
+// navegação, quando o conteúdo passa a ocupar o espaço liberado.
+@mixin authenticated-page($max-width: 1440px) {
+  @media (min-width: 901px) {
+    // O recuo fica no host (e não no body) para que o fundo da página continue
+    // cobrindo também a faixa atrás da sidebar.
+    :host {
+      display: block;
+      padding-left: calc(var(--sidebar-w) + var(--sidebar-gap));
+      padding-right: 40px;
+      transition: padding-left 180ms ease;
+    }
+
+    // Preenche a área livre e, em telas largas, centraliza a coluna com o teto
+    // de largura em vez de acumular todo o espaço excedente à direita.
+    .page-width {
+      width: auto;
+      max-width: $max-width;
+      margin-inline: auto;
+    }
+  }
+}

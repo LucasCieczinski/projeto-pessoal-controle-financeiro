@@ -1,0 +1,10 @@
+<div class="toast-host" role="status" aria-live="polite" aria-atomic="false">
+  @for (toast of notifications.toasts(); track toast.id) {
+    <div class="toast" [class.toast--warning]="toast.tone === 'warning'" [class.toast--error]="toast.tone === 'error'">
+      <p>{{ toast.message }}</p>
+      <button type="button" (click)="notifications.dismiss(toast.id)" aria-label="Fechar aviso">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+      </button>
+    </div>
+  }
+</div>

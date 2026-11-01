@@ -68,6 +68,35 @@ a estrutura: uma versão incorreta pode tentar repetir alterações ou omiti-las
 - Não há nova migração: os registros utilizam `tb_movimentacoes`, já prevista
   nas migrações existentes. Reinicie a API para carregar os novos endpoints.
 
+## Formato dos erros
+
+Toda falha tratada pelo `GlobalExceptionHandler` responde com o mesmo JSON, para o
+front-end não depender de mensagens específicas de cada endpoint:
+
+```json
+{
+  "timestamp": "2026-10-14T17:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "path": "/movimentacoes",
+  "mensagem": "Dados inválidos",
+  "campos": { "valor": "Informe um valor maior que zero." }
+}
+```
+
+- `status` e `error` seguem o padrão HTTP; `path` identifica o recurso solicitado e
+  `timestamp` (ISO-8601) permite correlacionar a falha com os logs.
+- `campos` só aparece em erros de validação, mapeando campo → mensagem.
+- O `AuthController` mantém o contrato enxuto de `401` (`mensagem` e `status`) usado
+  pela tela de login quando a sessão expira.
+
+## Perfil de produção
+
+`src/main/resources/application-prod.yaml`, ativado com `SPRING_PROFILES_ACTIVE=prod`,
+endurece os padrões: `COOKIE_SECURE` assume `true`, `ddl-auto` permanece em `validate`,
+o baseline do Flyway é desativado e `CORS_ALLOWED_ORIGINS` passa a ser obrigatório —
+a aplicação não sobe aceitando a origem de desenvolvimento por engano.
+
 ## Execução
 
 ```bash
