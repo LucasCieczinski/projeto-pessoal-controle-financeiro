@@ -90,6 +90,10 @@ O desenvolvimento foi dividido de forma incremental em 4 ondas principais:
 ### Onda 4: Diferencial (Would Have)
 - [ ] **Motor de Recomendação de Compra:** Algoritmo no Back-end que analisa a renda livre líquida do mês corrente e emite um parecer automatizado se o usuário deve ou não comprar um item da sua Lista de Desejos.
 
+### Integrações futuras (fora das ondas)
+
+- [ ] **Open Finance:** importação de dados bancários com consentimento do usuário. A integração não está implementada e depende de requisitos regulatórios e de segurança específicos. O estudo completo está em [`docs/open-finance.md`](docs/open-finance.md).
+
 ---
 
 ## 🗄️ Estrutura do Banco de Dados (Modelagem Relacional)
@@ -102,6 +106,7 @@ O banco de dados utiliza chaves do tipo **UUID** para evitar enumeração de rec
 - `tb_cartoes_credito`: Dados de limites e vencimentos.
 - `tb_dividas`: Registo de credores e parcelas.
 - `tb_gastos_recorrentes`: Agendamentos de despesas fixas.
+- `tb_sessoes_auth`: Sessões de autenticação e hashes dos refresh tokens.
 
 ---
 
@@ -114,7 +119,7 @@ O banco de dados utiliza chaves do tipo **UUID** para evitar enumeração de rec
 
 ### API
 ```bash
-cd ../api-financeira
+cd api-financas
 # Configure as variáveis descritas em .env.example na IDE ou no terminal.
 ./mvnw spring-boot:run
 ```
@@ -131,6 +136,6 @@ npm start
 - O layout deve funcionar bem em desktop e celular, sem dependência de empacotamento nativo.
 - A autenticação usa JWT curto em cookie HttpOnly, refresh token rotativo e proteção CSRF.
 - As telas implementadas são landing page, cadastro, login, resumo e movimentações completas.
-- Reinicie a API para disponibilizar resumo, edição e exclusão. Não há migração adicional nesta entrega.
-- Após a avaliação desta expansão, o próximo escopo é a Onda 2: rendas, cartões, dívidas e gastos recorrentes.
+- A Onda 1 está concluída. O próximo escopo é a Onda 2: rendas, cartões, dívidas e gastos recorrentes.
 - O front-end deve consumir a API por HTTPS em produção.
+- A importação de dados bancários via Open Finance é uma integração futura e não altera o saldo realizado sem confirmação do usuário. Ver [`docs/open-finance.md`](docs/open-finance.md).

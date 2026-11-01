@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import peres.lucas.apifinanceira.security.AuthCookieService;
 
 @Configuration
 public class OpenApiConfig {
@@ -14,7 +15,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         final String securitySchemeName = "cookieAuth";
-        final String cookieName = "ACCESS_COOKIE";
+        final String cookieName = AuthCookieService.ACCESS_COOKIE;
 
         return new OpenAPI()
                 .info(new Info()
