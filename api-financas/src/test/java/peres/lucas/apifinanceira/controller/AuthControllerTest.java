@@ -21,7 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,5 +81,15 @@ class AuthControllerTest {
                         .content("{\"email\":"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.mensagem").value("JSON inválido"));
+    }
+
+    @Test
+    void respostasIncluemSecurityHeadersDefensivos() throws Exception {
+        mockMvc.perform(get("/auth/csrf"))
+                .andExpect(status().isNoContent())
+                .andExpect(header().string("X-Frame-Options", "DENY"))
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"))
+                .andExpect(header().string("Referrer-Policy", "strict-origin-when-cross-origin"))
+                .andExpect(header().exists("Content-Security-Policy"));
     }
 }

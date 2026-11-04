@@ -1,0 +1,64 @@
+name: CI — À Tona (Backend & Frontend)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-ci:
+    name: Backend (Java 21 + Spring Boot 4)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api-financas
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Amazon Corretto)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          cache: 'maven'
+          cache-dependency-path: api-financas/pom.xml
+
+      - name: Make Maven Wrapper executable
+        run: chmod +x mvnw
+
+      - name: Run Maven Test & Verify
+        run: ./mvnw -B clean test
+
+  frontend-ci:
+    name: Frontend (Angular 22 + Vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-financas
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: web-financas/package-lock.json
+
+      - name: Install dependencies (Clean Install)
+        run: npm ci
+
+      - name: Run Unit Tests (Vitest Headless)
+        run: npm test -- --watch=false
+
+      - name: Build Production Bundle
+        run: npm run build

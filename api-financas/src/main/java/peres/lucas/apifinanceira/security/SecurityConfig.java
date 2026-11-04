@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -37,6 +39,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            @Value("${app.auth.cookie-secure:false}") boolean cookieSecure,
+                                           @Value("${app.swagger.enabled:true}") boolean swaggerEnabled,
                                            JwtUtil jwtUtil, AuthSessionRepository sessionRepository,
                                            RateLimitFilter rateLimitFilter,
                                            JwtAuthenticationEntryPoint authenticationEntryPoint,
@@ -44,27 +47,45 @@ public class SecurityConfig {
         CookieCsrfTokenRepository csrfRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfRepository.setCookieCustomizer(cookie -> cookie.secure(cookieSecure).sameSite("Lax").path("/"));
 
+        String cspPolicy = swaggerEnabled
+                ? "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'; form-action 'self'"
+                : "default-src 'none'; frame-ancestors 'none'; form-action 'none'";
+
         http
                 .csrf(csrf -> csrf.spa()
                         .csrfTokenRepository(csrfRepository)
                         .ignoringRequestMatchers("/users", "/auth/login")
                         .ignoringRequestMatchers(SWAGGER_ROUTES))
                 .cors(Customizer.withDefaults())
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                        .contentTypeOptions(Customizer.withDefaults())
+                        .referrerPolicy(referrer -> referrer.policy(
+                                ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000))
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(cspPolicy))
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
-                .authorizeHttpRequests(auth -> auth
-                        // Permite redirecionamentos internos (crucial para o index.html do Swagger funcionar no Spring 3/4)
-                        .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll()
-                        // Libera o acesso público à página de documentação (controlado por springdoc.api-docs.enabled em prod)
-                        .requestMatchers(SWAGGER_ROUTES).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users", "/auth/login", "/auth/refresh", "/auth/logout")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/csrf").permitAll()
-                        .anyRequest().authenticated()
-                )
-                // Rate limiting em endpoints sensíveis (login, cadastro, refresh, logout)
+                .authorizeHttpRequests(auth -> {
+                    // Permite redirecionamentos internos (crucial para o index.html do Swagger funcionar no Spring 3/4)
+                    auth.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll();
+                    // Libera ou bloqueia o acesso às rotas do Swagger conforme configuração do ambiente
+                    if (swaggerEnabled) {
+                        auth.requestMatchers(SWAGGER_ROUTES).permitAll();
+                    } else {
+                        auth.requestMatchers(SWAGGER_ROUTES).denyAll();
+                    }
+                    auth.requestMatchers(HttpMethod.POST, "/users", "/auth/login", "/auth/refresh", "/auth/logout")
+                            .permitAll()
+                            .requestMatchers(HttpMethod.GET, "/auth/csrf").permitAll()
+                            .anyRequest().authenticated();
+                })
+                // Rate limiting em endpoints sensíveis (login, cadastro, refresh)
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 // Valida JWT de acesso via cookie HttpOnly
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, sessionRepository),
