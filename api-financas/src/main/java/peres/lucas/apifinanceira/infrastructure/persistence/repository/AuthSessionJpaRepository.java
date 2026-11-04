@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface AuthSessionRepository extends JpaRepository<AuthSessionEntity, UUID> {
+public interface AuthSessionJpaRepository extends JpaRepository<AuthSessionEntity, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select session from AuthSessionEntity session where session.id = :id")

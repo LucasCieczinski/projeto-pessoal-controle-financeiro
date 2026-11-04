@@ -15,13 +15,13 @@ import java.util.concurrent.ConcurrentMap;
  * garantindo thread-safety sem contenção de lock global e com expurgo
  * automático de chaves inativas para evitar vazamento de memória.
  */
-public class RateLimitService implements RateLimitPort {
+public class InMemoryRateLimitAdapter implements RateLimitPort {
 
     private final int maxAttempts;
     private final long windowMs;
     private final ConcurrentMap<String, Queue<Instant>> windows = new ConcurrentHashMap<>();
 
-    public RateLimitService(int maxAttempts, long windowMs) {
+    public InMemoryRateLimitAdapter(int maxAttempts, long windowMs) {
         this.maxAttempts = maxAttempts;
         this.windowMs = windowMs;
     }

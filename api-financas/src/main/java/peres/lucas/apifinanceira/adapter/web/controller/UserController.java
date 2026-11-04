@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import peres.lucas.apifinanceira.infrastructure.config.ApiPaths;
 import peres.lucas.apifinanceira.application.dto.CreateUserRequestDto;
 import peres.lucas.apifinanceira.application.dto.UserResponseDto;
-import peres.lucas.apifinanceira.application.usecase.UserService;
+import peres.lucas.apifinanceira.application.usecase.UserUseCase;
 
 import java.net.URI;
 import java.security.Principal;
@@ -18,21 +18,21 @@ import java.security.Principal;
 @RequestMapping(ApiPaths.USERS)
 public class UserController {
 
-    private final UserService userService;
+    private final UserUseCase userUseCase;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserUseCase userUseCase) {
+        this.userUseCase = userUseCase;
     }
 
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody CreateUserRequestDto request) {
-        UserResponseDto user = userService.createUser(request);
+        UserResponseDto user = userUseCase.createUser(request);
         return ResponseEntity.created(URI.create(ApiPaths.USERS + "/" + user.id())).body(user);
     }
 
     @GetMapping("/me")
     @SecurityRequirement(name = "cookieAuth")
     public UserResponseDto currentUser(Principal principal) {
-        return userService.findByEmail(principal.getName());
+        return userUseCase.findByEmail(principal.getName());
     }
 }

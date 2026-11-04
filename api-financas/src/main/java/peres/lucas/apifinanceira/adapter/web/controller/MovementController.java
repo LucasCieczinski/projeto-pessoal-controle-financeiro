@@ -19,7 +19,7 @@ import peres.lucas.apifinanceira.application.dto.CreateMovementRequestDto;
 import peres.lucas.apifinanceira.application.dto.MovementResponseDto;
 import peres.lucas.apifinanceira.application.dto.MovementSummaryDto;
 import peres.lucas.apifinanceira.domain.exception.InvalidRequestException;
-import peres.lucas.apifinanceira.application.usecase.MovementService;
+import peres.lucas.apifinanceira.application.usecase.MovementUseCase;
 
 import java.security.Principal;
 import java.time.YearMonth;
@@ -33,31 +33,31 @@ import java.util.UUID;
 @RequestMapping(ApiPaths.MOVEMENTS)
 public class MovementController {
 
-    private final MovementService movementService;
+    private final MovementUseCase movementUseCase;
 
-    public MovementController(MovementService movementService) {
-        this.movementService = movementService;
+    public MovementController(MovementUseCase movementUseCase) {
+        this.movementUseCase = movementUseCase;
     }
 
     @GetMapping
     public List<MovementResponseDto> findForMonth(@RequestParam(defaultValue = "") String mes, Principal principal) {
-        return movementService.findForMonth(principal.getName(), parseMonth(mes));
+        return movementUseCase.findForMonth(principal.getName(), parseMonth(mes));
     }
 
     @GetMapping("/resumo")
     public MovementSummaryDto summary(@RequestParam(defaultValue = "") String mes, Principal principal) {
-        return movementService.summary(principal.getName(), parseMonth(mes));
+        return movementUseCase.summary(principal.getName(), parseMonth(mes));
     }
 
     @PutMapping("/{id}")
     public MovementResponseDto update(@PathVariable UUID id, @Valid @RequestBody CreateMovementRequestDto request,
                                       Principal principal) {
-        return movementService.update(principal.getName(), id, request);
+        return movementUseCase.update(principal.getName(), id, request);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id, Principal principal) {
-        movementService.delete(principal.getName(), id);
+        movementUseCase.delete(principal.getName(), id);
         return ResponseEntity.noContent().build();
     }
 
@@ -76,6 +76,6 @@ public class MovementController {
     public ResponseEntity<MovementResponseDto> create(@Valid @RequestBody CreateMovementRequestDto request,
                                                        Principal principal) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(movementService.create(principal.getName(), request));
+                .body(movementUseCase.create(principal.getName(), request));
     }
 }

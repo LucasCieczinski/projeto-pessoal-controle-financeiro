@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
+import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -17,9 +17,9 @@ import java.util.Collections;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final AuthSessionRepository sessionRepository;
+    private final AuthSessionRepositoryPort sessionRepository;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, AuthSessionRepository sessionRepository) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, AuthSessionRepositoryPort sessionRepository) {
         this.jwtUtil = jwtUtil;
         this.sessionRepository = sessionRepository;
     }

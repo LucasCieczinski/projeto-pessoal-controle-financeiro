@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.domain.model.User;
 import peres.lucas.apifinanceira.domain.port.UserRepositoryPort;
 import peres.lucas.apifinanceira.infrastructure.persistence.entity.UserEntity;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserJpaRepository;
 
 import java.util.Optional;
 
@@ -17,9 +17,9 @@ import java.util.Optional;
 @Component
 public class UserPersistenceAdapter implements UserRepositoryPort {
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
 
-    public UserPersistenceAdapter(UserRepository userRepository) {
+    public UserPersistenceAdapter(UserJpaRepository userRepository) {
         this.userRepository = userRepository;
     }
 

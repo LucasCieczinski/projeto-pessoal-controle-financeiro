@@ -10,11 +10,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import peres.lucas.apifinanceira.domain.exception.InvalidCredentialException;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
+import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
 import peres.lucas.apifinanceira.infrastructure.security.AuthCookieService;
 import peres.lucas.apifinanceira.infrastructure.security.JwtUtil;
 import peres.lucas.apifinanceira.infrastructure.security.SecurityConfig;
-import peres.lucas.apifinanceira.application.usecase.AuthService;
+import peres.lucas.apifinanceira.application.usecase.AuthUseCase;
 import peres.lucas.apifinanceira.application.usecase.SessionTokens;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,15 +36,15 @@ class AuthControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private AuthService authService;
+    private AuthUseCase authUseCase;
 
     @MockitoBean
-    private AuthSessionRepository sessionRepository;
+    private AuthSessionRepositoryPort sessionRepository;
 
     @Test
     void loginDefineCookiesHttpOnlySemExporTokensNoCorpo() throws Exception {
         doReturn(new SessionTokens("jwt-teste", "refresh-teste", true, 900000, 2592000000L))
-                .when(authService).login(any());
+                .when(authUseCase).login(any());
 
         var response = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +63,7 @@ class AuthControllerTest {
     @Test
     void credenciaisInvalidasRetornam401() throws Exception {
         doThrow(new InvalidCredentialException("Email ou senha inválidos"))
-                .when(authService).login(any());
+                .when(authUseCase).login(any());
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

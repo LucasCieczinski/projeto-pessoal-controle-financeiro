@@ -20,7 +20,7 @@ import peres.lucas.apifinanceira.infrastructure.config.ApiPaths;
 import peres.lucas.apifinanceira.application.dto.LoginDto;
 import peres.lucas.apifinanceira.adapter.web.exception.ErrorMessage;
 import peres.lucas.apifinanceira.infrastructure.security.AuthCookieService;
-import peres.lucas.apifinanceira.application.usecase.AuthService;
+import peres.lucas.apifinanceira.application.usecase.AuthUseCase;
 import peres.lucas.apifinanceira.application.usecase.SessionTokens;
 
 import java.util.Arrays;
@@ -31,11 +31,11 @@ import java.util.Optional;
 @RequestMapping(ApiPaths.AUTH)
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthUseCase authUseCase;
     private final AuthCookieService cookies;
 
-    public AuthController(AuthService authService, AuthCookieService cookies) {
-        this.authService = authService;
+    public AuthController(AuthUseCase authUseCase, AuthCookieService cookies) {
+        this.authUseCase = authUseCase;
         this.cookies = cookies;
     }
 
@@ -49,13 +49,13 @@ public class AuthController {
     public ResponseEntity<Void> login(@Valid @RequestBody LoginDto request, CsrfToken csrfToken,
                                       HttpServletResponse response) {
         csrfToken.getToken();
-        return issued(authService.login(request), response);
+        return issued(authUseCase.login(request), response);
     }
 
     @PostMapping("/refresh")
     @SecurityRequirement(name = "cookieAuth")
     public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
-        return authService.refresh(cookie(request, AuthCookieService.REFRESH_COOKIE).orElse(null))
+        return authUseCase.refresh(cookie(request, AuthCookieService.REFRESH_COOKIE).orElse(null))
                 .<ResponseEntity<?>>map(tokens -> issued(tokens, response))
                 .orElseGet(() -> {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -67,7 +67,7 @@ public class AuthController {
     @PostMapping("/logout")
     @SecurityRequirement(name = "cookieAuth")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        authService.logout(cookie(request, AuthCookieService.REFRESH_COOKIE).orElse(null));
+        authUseCase.logout(cookie(request, AuthCookieService.REFRESH_COOKIE).orElse(null));
         clear(response);
         return ResponseEntity.noContent().build();
     }

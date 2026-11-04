@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import org.springframework.data.domain.Pageable;
 import peres.lucas.apifinanceira.domain.model.MovementType;
 
-public interface MovementRepository extends JpaRepository<MovementEntity, UUID> {
+public interface MovementJpaRepository extends JpaRepository<MovementEntity, UUID> {
 
     Optional<MovementEntity> findByIdAndUser_Id(UUID id, UUID userId);
 

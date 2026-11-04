@@ -10,19 +10,19 @@ import org.springframework.context.annotation.Configuration;
 public class RateLimitConfig {
 
     @Bean
-    public RateLimitService loginRateLimitService(RateLimitProperties properties) {
-        return new RateLimitService(properties.loginMaxAttempts(), properties.loginWindowMs());
+    public InMemoryRateLimitAdapter loginRateLimitService(RateLimitProperties properties) {
+        return new InMemoryRateLimitAdapter(properties.loginMaxAttempts(), properties.loginWindowMs());
     }
 
     @Bean
-    public RateLimitService authRateLimitService(RateLimitProperties properties) {
-        return new RateLimitService(properties.authMaxAttempts(), properties.authWindowMs());
+    public InMemoryRateLimitAdapter authRateLimitService(RateLimitProperties properties) {
+        return new InMemoryRateLimitAdapter(properties.authMaxAttempts(), properties.authWindowMs());
     }
 
     @Bean
     public RateLimitFilter rateLimitFilter(
-            RateLimitService loginRateLimitService,
-            RateLimitService authRateLimitService
+            InMemoryRateLimitAdapter loginRateLimitService,
+            InMemoryRateLimitAdapter authRateLimitService
     ) {
         return new RateLimitFilter(loginRateLimitService, authRateLimitService, new ObjectMapper().findAndRegisterModules());
     }

@@ -19,8 +19,8 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
 import peres.lucas.apifinanceira.infrastructure.config.ApiPaths;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            @Value("${app.auth.cookie-secure:false}") boolean cookieSecure,
                                            @Value("${app.swagger.enabled:true}") boolean swaggerEnabled,
-                                           JwtUtil jwtUtil, AuthSessionRepository sessionRepository,
+                                           JwtUtil jwtUtil, AuthSessionRepositoryPort sessionRepository,
                                            RateLimitFilter rateLimitFilter,
                                            JwtAuthenticationEntryPoint authenticationEntryPoint,
                                            JwtAccessDeniedHandler accessDeniedHandler) throws Exception {

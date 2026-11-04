@@ -10,8 +10,8 @@ import peres.lucas.apifinanceira.application.dto.CreateUserRequestDto;
 import peres.lucas.apifinanceira.application.dto.UserResponseDto;
 import peres.lucas.apifinanceira.infrastructure.persistence.entity.UserEntity;
 import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
-import peres.lucas.apifinanceira.application.usecase.UserService;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserJpaRepository;
+import peres.lucas.apifinanceira.application.usecase.UserUseCase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,13 +19,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class UserServiceIntegrationTest {
+class UserUseCaseIntegrationTest {
 
     @Autowired
-    private UserService userService;
+    private UserUseCase userUseCase;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -38,7 +38,7 @@ class UserServiceIntegrationTest {
     void deveCriarUsuarioNoBancoComSenhaCodificada() {
         CreateUserRequestDto user = buildUser("lucas.integracao@teste.com");
 
-        UserResponseDto response = userService.createUser(user);
+        UserResponseDto response = userUseCase.createUser(user);
 
         assertThat(response.email()).isEqualTo("lucas.integracao@teste.com");
 
@@ -55,11 +55,11 @@ class UserServiceIntegrationTest {
     @Test
     void deveLancarExcecao_QuandoEmailJaExisteNoBanco() {
         CreateUserRequestDto primeiroUsuario = buildUser("duplicado@teste.com");
-        userService.createUser(primeiroUsuario);
+        userUseCase.createUser(primeiroUsuario);
 
         CreateUserRequestDto segundoUsuario = buildUser("duplicado@teste.com");
 
-        assertThatThrownBy(() -> userService.createUser(segundoUsuario))
+        assertThatThrownBy(() -> userUseCase.createUser(segundoUsuario))
                 .isInstanceOf(EmailAlreadyInUseException.class)
                 .hasMessageContaining("Email já está sendo usado");
 

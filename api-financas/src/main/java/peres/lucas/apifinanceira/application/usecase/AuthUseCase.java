@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class AuthService {
+public class AuthUseCase {
 
     private final UserRepositoryPort userRepository;
     private final AuthSessionRepositoryPort sessionRepository;
@@ -33,7 +33,7 @@ public class AuthService {
     private final long rememberDurationMs;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public AuthService(UserRepositoryPort userRepository, AuthSessionRepositoryPort sessionRepository,
+    public AuthUseCase(UserRepositoryPort userRepository, AuthSessionRepositoryPort sessionRepository,
                        PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
                        @Value("${app.auth.refresh-session-ms}") long sessionDurationMs,
                        @Value("${app.auth.refresh-remember-ms}") long rememberDurationMs) {

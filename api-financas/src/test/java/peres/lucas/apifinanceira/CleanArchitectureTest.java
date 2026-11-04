@@ -1,9 +1,9 @@
 package peres.lucas.apifinanceira;
 
 import org.junit.jupiter.api.Test;
-import peres.lucas.apifinanceira.application.usecase.AuthService;
-import peres.lucas.apifinanceira.application.usecase.MovementService;
-import peres.lucas.apifinanceira.application.usecase.UserService;
+import peres.lucas.apifinanceira.application.usecase.AuthUseCase;
+import peres.lucas.apifinanceira.application.usecase.MovementUseCase;
+import peres.lucas.apifinanceira.application.usecase.UserUseCase;
 import peres.lucas.apifinanceira.domain.model.AuthSession;
 import peres.lucas.apifinanceira.domain.model.Movement;
 import peres.lucas.apifinanceira.domain.model.MovementTotals;
@@ -108,29 +108,33 @@ class CleanArchitectureTest {
 
     @Test
     void servicosDeAplicacaoDependemApenasDePortsENaoDeInfraestruturaPersistencia() {
-        List<Class<?>> applicationServices = List.of(
-                UserService.class,
-                MovementService.class,
-                AuthService.class
+        List<Class<?>> applicationUseCases = List.of(
+                UserUseCase.class,
+                MovementUseCase.class,
+                AuthUseCase.class
         );
 
-        for (Class<?> serviceClass : applicationServices) {
-            for (Field field : serviceClass.getDeclaredFields()) {
+        for (Class<?> useCaseClass : applicationUseCases) {
+            assertThat(useCaseClass.getSimpleName())
+                    .withFailMessage("Casos de uso na camada application.usecase devem ter sufixo 'UseCase'")
+                    .endsWith("UseCase");
+
+            for (Field field : useCaseClass.getDeclaredFields()) {
                 String typeName = field.getType().getName();
                 assertThat(typeName)
-                        .withFailMessage("O serviço %s não deve injetar tipo de persistência JPA (%s), use a interface *Port do domínio",
-                                serviceClass.getSimpleName(), typeName)
+                        .withFailMessage("O UseCase %s não deve injetar tipo de persistência JPA (%s), use a interface *Port do domínio",
+                                useCaseClass.getSimpleName(), typeName)
                         .doesNotStartWith("peres.lucas.apifinanceira.infrastructure.persistence.");
             }
 
-            for (Constructor<?> constructor : serviceClass.getDeclaredConstructors()) {
+            for (Constructor<?> constructor : useCaseClass.getDeclaredConstructors()) {
                 List<String> paramTypes = Arrays.stream(constructor.getParameterTypes())
                         .map(Class::getName)
                         .toList();
                 for (String paramType : paramTypes) {
                     assertThat(paramType)
                             .withFailMessage("O construtor de %s não deve receber tipo de persistência JPA (%s), use a interface *Port do domínio",
-                                    serviceClass.getSimpleName(), paramType)
+                                    useCaseClass.getSimpleName(), paramType)
                             .doesNotStartWith("peres.lucas.apifinanceira.infrastructure.persistence.");
                 }
             }

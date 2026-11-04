@@ -10,12 +10,12 @@ import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
 import peres.lucas.apifinanceira.domain.exception.UserNotFoundException;
 
 @Service
-public class UserService {
+public class UserUseCase {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepositoryPort userRepository;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepositoryPort userRepository) {
+    public UserUseCase(PasswordEncoder passwordEncoder, UserRepositoryPort userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }

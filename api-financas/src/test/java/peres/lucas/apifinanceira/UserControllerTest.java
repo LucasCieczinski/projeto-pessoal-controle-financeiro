@@ -14,8 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import peres.lucas.apifinanceira.adapter.web.controller.UserController;
 import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
 import peres.lucas.apifinanceira.infrastructure.security.SecurityConfig;
-import peres.lucas.apifinanceira.application.usecase.UserService;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
+import peres.lucas.apifinanceira.application.usecase.UserUseCase;
+import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.time.LocalDateTime;
@@ -39,10 +39,10 @@ class UserControllerTest {
     private final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     @MockitoBean
-    private UserService userService;
+    private UserUseCase userUseCase;
 
     @MockitoBean
-    private AuthSessionRepository sessionRepository;
+    private AuthSessionRepositoryPort sessionRepository;
 
     private CreateUserRequestDto buildUser() {
         return new CreateUserRequestDto("Lucas Peres", "lucas@teste.com", "senha123");
@@ -57,7 +57,7 @@ class UserControllerTest {
                 user.email(),
                 LocalDateTime.now()
         );
-        doReturn(response).when(userService).createUser(any(CreateUserRequestDto.class));
+        doReturn(response).when(userUseCase).createUser(any(CreateUserRequestDto.class));
 
         mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +91,7 @@ class UserControllerTest {
     void deveRetornar409_QuandoEmailJaEstaEmUso() throws Exception {
         CreateUserRequestDto user = buildUser();
         doThrow(new EmailAlreadyInUseException("Erro: Email já está sendo usado"))
-                .when(userService).createUser(any(CreateUserRequestDto.class));
+                .when(userUseCase).createUser(any(CreateUserRequestDto.class));
 
         mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)

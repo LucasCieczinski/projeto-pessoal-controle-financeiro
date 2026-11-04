@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class MovementService {
+public class MovementUseCase {
 
     private final MovementRepositoryPort movementRepository;
     private final UserRepositoryPort userRepository;
 
-    public MovementService(MovementRepositoryPort movementRepository, UserRepositoryPort userRepository) {
+    public MovementUseCase(MovementRepositoryPort movementRepository, UserRepositoryPort userRepository) {
         this.movementRepository = movementRepository;
         this.userRepository = userRepository;
     }

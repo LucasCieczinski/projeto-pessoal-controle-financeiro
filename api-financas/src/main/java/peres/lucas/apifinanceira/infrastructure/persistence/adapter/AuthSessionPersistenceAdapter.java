@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.domain.model.AuthSession;
 import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
 import peres.lucas.apifinanceira.infrastructure.persistence.entity.AuthSessionEntity;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionJpaRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserJpaRepository;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -17,10 +17,10 @@ import java.util.UUID;
 @Component
 public class AuthSessionPersistenceAdapter implements AuthSessionRepositoryPort {
 
-    private final AuthSessionRepository sessionRepository;
-    private final UserRepository userRepository;
+    private final AuthSessionJpaRepository sessionRepository;
+    private final UserJpaRepository userRepository;
 
-    public AuthSessionPersistenceAdapter(AuthSessionRepository sessionRepository, UserRepository userRepository) {
+    public AuthSessionPersistenceAdapter(AuthSessionJpaRepository sessionRepository, UserJpaRepository userRepository) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
     }

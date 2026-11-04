@@ -27,18 +27,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceTest {
+class AuthUseCaseTest {
 
     @Mock private UserRepositoryPort userRepository;
     @Mock private AuthSessionRepositoryPort sessionRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private JwtUtil jwtUtil;
 
-    private AuthService authService;
+    private AuthUseCase authUseCase;
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(userRepository, sessionRepository, passwordEncoder, jwtUtil,
+        authUseCase = new AuthUseCase(userRepository, sessionRepository, passwordEncoder, jwtUtil,
                 86400000L, 2592000000L);
     }
 
@@ -66,7 +66,7 @@ class AuthServiceTest {
         when(jwtUtil.generateToken(eq("lucas@teste.com"), any(UUID.class))).thenReturn("jwt-gerado");
         when(jwtUtil.getExpirationMs()).thenReturn(900000L);
 
-        SessionTokens tokens = authService.login(login("Lucas@Teste.com", "senha123"));
+        SessionTokens tokens = authUseCase.login(login("Lucas@Teste.com", "senha123"));
 
         assertThat(tokens.accessToken()).isEqualTo("jwt-gerado");
         assertThat(tokens.refreshToken()).isNotBlank();
@@ -81,7 +81,7 @@ class AuthServiceTest {
         LoginDto request = login("naoexiste@teste.com", "senha123");
         when(userRepository.findByEmail("naoexiste@teste.com")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> authService.login(request))
+        assertThatThrownBy(() -> authUseCase.login(request))
                 .isInstanceOf(InvalidCredentialException.class);
     }
 
@@ -91,7 +91,7 @@ class AuthServiceTest {
         when(userRepository.findByEmail("lucas@teste.com")).thenReturn(Optional.of(buildUser()));
         when(passwordEncoder.matches("senhaErrada", "hashBcryptSimulado")).thenReturn(false);
 
-        assertThatThrownBy(() -> authService.login(request))
+        assertThatThrownBy(() -> authUseCase.login(request))
                 .isInstanceOf(InvalidCredentialException.class);
     }
 }

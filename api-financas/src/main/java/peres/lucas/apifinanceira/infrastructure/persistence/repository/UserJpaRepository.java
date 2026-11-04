@@ -6,7 +6,7 @@ import peres.lucas.apifinanceira.infrastructure.persistence.entity.UserEntity;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<UserEntity, UUID> {
+public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
 
     boolean existsByEmail(String email);
 

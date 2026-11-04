@@ -7,8 +7,8 @@ import peres.lucas.apifinanceira.domain.model.Movement;
 import peres.lucas.apifinanceira.domain.model.MovementTotals;
 import peres.lucas.apifinanceira.domain.port.MovementRepositoryPort;
 import peres.lucas.apifinanceira.infrastructure.persistence.entity.MovementEntity;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.MovementRepository;
-import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.MovementJpaRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserJpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,10 +24,10 @@ import java.util.UUID;
 @Component
 public class MovementPersistenceAdapter implements MovementRepositoryPort {
 
-    private final MovementRepository movementRepository;
-    private final UserRepository userRepository;
+    private final MovementJpaRepository movementRepository;
+    private final UserJpaRepository userRepository;
 
-    public MovementPersistenceAdapter(MovementRepository movementRepository, UserRepository userRepository) {
+    public MovementPersistenceAdapter(MovementJpaRepository movementRepository, UserJpaRepository userRepository) {
         this.movementRepository = movementRepository;
         this.userRepository = userRepository;
     }
