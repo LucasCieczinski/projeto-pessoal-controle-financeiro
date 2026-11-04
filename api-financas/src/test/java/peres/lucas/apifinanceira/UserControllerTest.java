@@ -59,7 +59,7 @@ class UserControllerTest {
         );
         doReturn(response).when(userService).createUser(any(CreateUserRequestDto.class));
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(user)))
                 .andExpect(status().isCreated())
@@ -71,7 +71,7 @@ class UserControllerTest {
     void deveRetornar400_QuandoSenhaEstaVazia() throws Exception {
         CreateUserRequestDto user = new CreateUserRequestDto("Lucas Peres", "lucas@teste.com", "");
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest());
@@ -81,7 +81,7 @@ class UserControllerTest {
     void deveRetornar400_QuandoEmailEstaNulo() throws Exception {
         CreateUserRequestDto user = new CreateUserRequestDto("Lucas Peres", null, "senha123");
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest());
@@ -93,7 +93,7 @@ class UserControllerTest {
         doThrow(new EmailAlreadyInUseException("Erro: Email já está sendo usado"))
                 .when(userService).createUser(any(CreateUserRequestDto.class));
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(user)))
                 .andExpect(status().isConflict())

@@ -1,5 +1,7 @@
 package peres.lucas.apifinanceira.security;
 
+import peres.lucas.apifinanceira.domain.port.RateLimitPort;
+
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -13,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
  * garantindo thread-safety sem contenção de lock global e com expurgo
  * automático de chaves inativas para evitar vazamento de memória.
  */
-public class RateLimitService {
+public class RateLimitService implements RateLimitPort {
 
     private final int maxAttempts;
     private final long windowMs;

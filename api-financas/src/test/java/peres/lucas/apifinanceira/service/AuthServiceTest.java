@@ -3,17 +3,19 @@ package peres.lucas.apifinanceira.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import peres.lucas.apifinanceira.domain.model.AuthSession;
+import peres.lucas.apifinanceira.domain.model.User;
+import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
+import peres.lucas.apifinanceira.domain.port.UserRepositoryPort;
 import peres.lucas.apifinanceira.dto.LoginDto;
-import peres.lucas.apifinanceira.entity.AuthSessionEntity;
-import peres.lucas.apifinanceira.entity.UserEntity;
 import peres.lucas.apifinanceira.exception.InvalidCredentialException;
-import peres.lucas.apifinanceira.repository.AuthSessionRepository;
-import peres.lucas.apifinanceira.repository.UserRepository;
 import peres.lucas.apifinanceira.security.JwtUtil;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,8 +29,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
-    @Mock private UserRepository userRepository;
-    @Mock private AuthSessionRepository sessionRepository;
+    @Mock private UserRepositoryPort userRepository;
+    @Mock private AuthSessionRepositoryPort sessionRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private JwtUtil jwtUtil;
 
@@ -40,12 +42,14 @@ class AuthServiceTest {
                 86400000L, 2592000000L);
     }
 
-    private UserEntity buildUser() {
-        UserEntity user = new UserEntity();
-        user.setNome("Lucas Peres");
-        user.setEmail("lucas@teste.com");
-        user.setSenha("hashBcryptSimulado");
-        return user;
+    private User buildUser() {
+        return new User(
+                UUID.randomUUID(),
+                "Lucas Peres",
+                "lucas@teste.com",
+                "hashBcryptSimulado",
+                LocalDateTime.now()
+        );
     }
 
     private LoginDto login(String email, String senha) {
@@ -67,7 +71,7 @@ class AuthServiceTest {
         assertThat(tokens.accessToken()).isEqualTo("jwt-gerado");
         assertThat(tokens.refreshToken()).isNotBlank();
         assertThat(tokens.persistent()).isFalse();
-        var saved = org.mockito.ArgumentCaptor.forClass(AuthSessionEntity.class);
+        var saved = ArgumentCaptor.forClass(AuthSession.class);
         verify(sessionRepository).save(saved.capture());
         assertThat(saved.getValue().getRefreshTokenHash()).isNotEqualTo(tokens.refreshToken()).hasSize(64);
     }

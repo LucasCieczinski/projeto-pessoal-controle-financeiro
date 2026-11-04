@@ -2,39 +2,38 @@ package peres.lucas.apifinanceira.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import peres.lucas.apifinanceira.domain.model.User;
+import peres.lucas.apifinanceira.domain.port.UserRepositoryPort;
 import peres.lucas.apifinanceira.dto.CreateUserRequestDto;
 import peres.lucas.apifinanceira.dto.UserResponseDto;
-import peres.lucas.apifinanceira.entity.UserEntity;
 import peres.lucas.apifinanceira.exception.EmailAlreadyInUseException;
 import peres.lucas.apifinanceira.exception.UserNotFoundException;
-import peres.lucas.apifinanceira.repository.UserRepository;
-
-import java.util.Locale;
 
 @Service
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepository;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public UserService(PasswordEncoder passwordEncoder, UserRepositoryPort userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 
     public UserResponseDto createUser(CreateUserRequestDto request) {
-        String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
+        String normalizedEmail = User.normalizeEmail(request.email());
 
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new EmailAlreadyInUseException("Erro: Email já está sendo usado");
         }
 
-        UserEntity user = new UserEntity();
-        user.setNome(request.nome().trim());
-        user.setEmail(normalizedEmail);
-        user.setSenha(passwordEncoder.encode(request.senha()));
+        User novoUsuario = User.novo(
+                request.nome(),
+                normalizedEmail,
+                passwordEncoder.encode(request.senha())
+        );
 
-        return toResponse(userRepository.save(user));
+        return toResponse(userRepository.save(novoUsuario));
     }
 
     public UserResponseDto findByEmail(String email) {
@@ -43,7 +42,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
     }
 
-    private UserResponseDto toResponse(UserEntity user) {
+    private UserResponseDto toResponse(User user) {
         return new UserResponseDto(
                 user.getId(),
                 user.getNome(),

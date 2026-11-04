@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 import peres.lucas.apifinanceira.config.ApiPaths;
+import peres.lucas.apifinanceira.domain.port.RateLimitPort;
 import peres.lucas.apifinanceira.exception.ErrorMessage;
 
 import java.io.IOException;
@@ -22,11 +23,11 @@ import java.nio.charset.StandardCharsets;
  */
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    private final RateLimitService loginRateLimit;
-    private final RateLimitService authRateLimit;
+    private final RateLimitPort loginRateLimit;
+    private final RateLimitPort authRateLimit;
     private final ObjectMapper objectMapper;
 
-    public RateLimitFilter(RateLimitService loginRateLimit, RateLimitService authRateLimit, ObjectMapper objectMapper) {
+    public RateLimitFilter(RateLimitPort loginRateLimit, RateLimitPort authRateLimit, ObjectMapper objectMapper) {
         this.loginRateLimit = loginRateLimit;
         this.authRateLimit = authRateLimit;
         this.objectMapper = objectMapper;

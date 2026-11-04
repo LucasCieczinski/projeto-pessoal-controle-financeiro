@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import peres.lucas.apifinanceira.domain.model.AuthSession;
+import peres.lucas.apifinanceira.domain.model.User;
+import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
+import peres.lucas.apifinanceira.domain.port.UserRepositoryPort;
 import peres.lucas.apifinanceira.dto.LoginDto;
-import peres.lucas.apifinanceira.entity.AuthSessionEntity;
-import peres.lucas.apifinanceira.entity.UserEntity;
 import peres.lucas.apifinanceira.exception.InvalidCredentialException;
-import peres.lucas.apifinanceira.repository.AuthSessionRepository;
-import peres.lucas.apifinanceira.repository.UserRepository;
 import peres.lucas.apifinanceira.security.JwtUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -19,22 +19,21 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final AuthSessionRepository sessionRepository;
+    private final UserRepositoryPort userRepository;
+    private final AuthSessionRepositoryPort sessionRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final long sessionDurationMs;
     private final long rememberDurationMs;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public AuthService(UserRepository userRepository, AuthSessionRepository sessionRepository,
+    public AuthService(UserRepositoryPort userRepository, AuthSessionRepositoryPort sessionRepository,
                        PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
                        @Value("${app.auth.refresh-session-ms}") long sessionDurationMs,
                        @Value("${app.auth.refresh-remember-ms}") long rememberDurationMs) {
@@ -51,24 +50,29 @@ public class AuthService {
 
     @Transactional
     public SessionTokens login(LoginDto request) {
-        String normalizedEmail = request.getEmail().trim().toLowerCase(Locale.ROOT);
-        UserEntity user = userRepository.findByEmail(normalizedEmail)
+        String normalizedEmail = User.normalizeEmail(request.getEmail());
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new InvalidCredentialException("Email ou senha inválidos"));
 
-        if (!passwordEncoder.matches(request.getSenha(), user.getSenha())) {
+        if (!passwordEncoder.matches(request.getSenha(), user.getSenhaHash())) {
             throw new InvalidCredentialException("Email ou senha inválidos");
         }
 
         Instant now = Instant.now();
-        AuthSessionEntity session = new AuthSessionEntity();
-        session.setId(UUID.randomUUID());
-        session.setUser(user);
-        session.setPersistent(request.isRemember());
-        session.setCreatedAt(now);
-        long refreshMaxAgeMs = refreshDuration(session.isPersistent());
-        session.setExpiresAt(now.plusMillis(refreshMaxAgeMs));
-        String refreshToken = newRefreshToken(session.getId());
-        session.setRefreshTokenHash(hash(refreshToken));
+        UUID sessionId = UUID.randomUUID();
+        boolean persistent = request.isRemember();
+        long refreshMaxAgeMs = refreshDuration(persistent);
+        String refreshToken = newRefreshToken(sessionId);
+
+        AuthSession session = new AuthSession(
+                sessionId,
+                user.getId() != null ? user.getId() : UUID.randomUUID(),
+                user.getEmail(),
+                hash(refreshToken),
+                now.plusMillis(refreshMaxAgeMs),
+                now,
+                persistent
+        );
         sessionRepository.save(session);
 
         return tokensFor(session, refreshToken, refreshMaxAgeMs);
@@ -80,13 +84,14 @@ public class AuthService {
         if (id.isEmpty()) {
             return Optional.empty();
         }
-        Optional<AuthSessionEntity> found = sessionRepository.findForUpdate(id.get());
+        Optional<AuthSession> found = sessionRepository.findForUpdate(id.get());
         if (found.isEmpty()) {
             return Optional.empty();
         }
-        AuthSessionEntity session = found.get();
-        if (!session.getExpiresAt().isAfter(Instant.now())) {
-            sessionRepository.delete(session);
+        AuthSession session = found.get();
+        Instant now = Instant.now();
+        if (session.isExpired(now)) {
+            sessionRepository.deleteById(session.getId());
             return Optional.empty();
         }
         if (!matches(refreshToken, session.getRefreshTokenHash())) {
@@ -95,8 +100,9 @@ public class AuthService {
 
         long refreshMaxAgeMs = refreshDuration(session.isPersistent());
         String rotatedToken = newRefreshToken(session.getId());
-        session.setRefreshTokenHash(hash(rotatedToken));
-        session.setExpiresAt(Instant.now().plusMillis(refreshMaxAgeMs));
+        session.rotate(hash(rotatedToken), now.plusMillis(refreshMaxAgeMs));
+        sessionRepository.save(session);
+
         return Optional.of(tokensFor(session, rotatedToken, refreshMaxAgeMs));
     }
 
@@ -105,11 +111,11 @@ public class AuthService {
         sessionIdFromRefreshToken(refreshToken)
                 .flatMap(sessionRepository::findForUpdate)
                 .filter(session -> matches(refreshToken, session.getRefreshTokenHash()))
-                .ifPresent(sessionRepository::delete);
+                .ifPresent(session -> sessionRepository.deleteById(session.getId()));
     }
 
-    private SessionTokens tokensFor(AuthSessionEntity session, String refreshToken, long refreshMaxAgeMs) {
-        String accessToken = jwtUtil.generateToken(session.getUser().getEmail(), session.getId());
+    private SessionTokens tokensFor(AuthSession session, String refreshToken, long refreshMaxAgeMs) {
+        String accessToken = jwtUtil.generateToken(session.getUsuarioEmail(), session.getId());
         return new SessionTokens(accessToken, refreshToken, session.isPersistent(),
                 jwtUtil.getExpirationMs(), refreshMaxAgeMs);
     }
