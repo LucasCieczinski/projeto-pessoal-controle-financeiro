@@ -3,9 +3,9 @@ package peres.lucas.apifinanceira.infrastructure.persistence;
 import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.domain.model.AuthSession;
 import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
-import peres.lucas.apifinanceira.entity.AuthSessionEntity;
-import peres.lucas.apifinanceira.repository.AuthSessionRepository;
-import peres.lucas.apifinanceira.repository.UserRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.entity.AuthSessionEntity;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
 
 import java.time.Instant;
 import java.util.Optional;

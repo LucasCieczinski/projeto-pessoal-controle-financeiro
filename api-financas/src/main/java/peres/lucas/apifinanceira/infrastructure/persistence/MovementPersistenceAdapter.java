@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.domain.model.Movement;
 import peres.lucas.apifinanceira.domain.model.MovementTotals;
 import peres.lucas.apifinanceira.domain.port.MovementRepositoryPort;
-import peres.lucas.apifinanceira.entity.MovementEntity;
-import peres.lucas.apifinanceira.repository.MovementRepository;
-import peres.lucas.apifinanceira.repository.UserRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.entity.MovementEntity;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.MovementRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;

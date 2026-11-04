@@ -1,9 +1,9 @@
 package peres.lucas.apifinanceira;
 
 import org.junit.jupiter.api.Test;
-import peres.lucas.apifinanceira.dto.CreateUserRequestDto;
-import peres.lucas.apifinanceira.dto.UserResponseDto;
-import peres.lucas.apifinanceira.security.JwtUtil;
+import peres.lucas.apifinanceira.application.dto.CreateUserRequestDto;
+import peres.lucas.apifinanceira.application.dto.UserResponseDto;
+import peres.lucas.apifinanceira.infrastructure.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -11,11 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import peres.lucas.apifinanceira.controller.UserController;
-import peres.lucas.apifinanceira.exception.EmailAlreadyInUseException;
-import peres.lucas.apifinanceira.security.SecurityConfig;
-import peres.lucas.apifinanceira.service.UserService;
-import peres.lucas.apifinanceira.repository.AuthSessionRepository;
+import peres.lucas.apifinanceira.adapter.web.controller.UserController;
+import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
+import peres.lucas.apifinanceira.infrastructure.security.SecurityConfig;
+import peres.lucas.apifinanceira.application.service.UserService;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.time.LocalDateTime;

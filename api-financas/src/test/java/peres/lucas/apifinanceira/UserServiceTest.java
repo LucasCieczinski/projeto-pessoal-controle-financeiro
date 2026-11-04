@@ -6,12 +6,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import peres.lucas.apifinanceira.dto.CreateUserRequestDto;
-import peres.lucas.apifinanceira.dto.UserResponseDto;
-import peres.lucas.apifinanceira.entity.UserEntity;
-import peres.lucas.apifinanceira.exception.EmailAlreadyInUseException;
-import peres.lucas.apifinanceira.repository.UserRepository;
-import peres.lucas.apifinanceira.service.UserService;
+import peres.lucas.apifinanceira.application.dto.CreateUserRequestDto;
+import peres.lucas.apifinanceira.application.dto.UserResponseDto;
+import peres.lucas.apifinanceira.infrastructure.persistence.entity.UserEntity;
+import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
+import peres.lucas.apifinanceira.application.service.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

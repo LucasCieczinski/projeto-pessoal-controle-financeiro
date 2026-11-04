@@ -1,6 +1,6 @@
 package peres.lucas.apifinanceira.domain.model;
 
-import peres.lucas.apifinanceira.entity.MovementType;
+import peres.lucas.apifinanceira.domain.model.MovementType;
 
 import java.math.BigDecimal;
 

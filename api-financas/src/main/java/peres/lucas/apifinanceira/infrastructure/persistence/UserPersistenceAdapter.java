@@ -3,8 +3,8 @@ package peres.lucas.apifinanceira.infrastructure.persistence;
 import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.domain.model.User;
 import peres.lucas.apifinanceira.domain.port.UserRepositoryPort;
-import peres.lucas.apifinanceira.entity.UserEntity;
-import peres.lucas.apifinanceira.repository.UserRepository;
+import peres.lucas.apifinanceira.infrastructure.persistence.entity.UserEntity;
+import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
 
 import java.util.Optional;
 

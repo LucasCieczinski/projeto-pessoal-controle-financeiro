@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import peres.lucas.apifinanceira.security.SecurityConfig;
+import peres.lucas.apifinanceira.infrastructure.security.SecurityConfig;
 
 @SpringBootTest
 @Import(SecurityConfig.class)
