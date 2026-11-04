@@ -46,7 +46,7 @@ class AuthControllerTest {
         doReturn(new SessionTokens("jwt-teste", "refresh-teste", true, 900000, 2592000000L))
                 .when(authService).login(any());
 
-        var response = mockMvc.perform(post("/auth/login")
+        var response = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"lucas@teste.com","senha":"senha123","remember":true}
@@ -65,7 +65,7 @@ class AuthControllerTest {
         doThrow(new InvalidCredentialException("Email ou senha inválidos"))
                 .when(authService).login(any());
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"lucas@teste.com","senha":"senhaErrada"}
@@ -76,7 +76,7 @@ class AuthControllerTest {
 
     @Test
     void jsonMalformadoRetorna400() throws Exception {
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":"))
                 .andExpect(status().isBadRequest())
@@ -85,7 +85,7 @@ class AuthControllerTest {
 
     @Test
     void respostasIncluemSecurityHeadersDefensivos() throws Exception {
-        mockMvc.perform(get("/auth/csrf"))
+        mockMvc.perform(get("/api/v1/auth/csrf"))
                 .andExpect(status().isNoContent())
                 .andExpect(header().string("X-Frame-Options", "DENY"))
                 .andExpect(header().string("X-Content-Type-Options", "nosniff"))

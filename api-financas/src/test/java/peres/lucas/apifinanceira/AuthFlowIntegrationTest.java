@@ -30,7 +30,7 @@ class AuthFlowIntegrationTest {
     @Test
     void cadastroLoginRefreshRotacaoELogout() throws Exception {
         String email = "fluxo.integracao@teste.com";
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"nome":"Usuário Integração","email":"%s","senha":"senha123"}
@@ -39,7 +39,7 @@ class AuthFlowIntegrationTest {
                 .andExpect(jsonPath("$.email").value(email))
                 .andExpect(jsonPath("$.senha").doesNotExist());
 
-        MockHttpServletResponse login = mockMvc.perform(post("/auth/login")
+        MockHttpServletResponse login = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"%s","senha":"senha123","remember":true}
@@ -54,24 +54,24 @@ class AuthFlowIntegrationTest {
                 .anyMatch(value -> value.startsWith("atona_refresh=") && value.contains("HttpOnly"))
                 .anyMatch(value -> value.startsWith("XSRF-TOKEN=") && !value.contains("HttpOnly"));
 
-        mockMvc.perform(get("/users/me"))
+        mockMvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/users/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + access.getValue()))
+        mockMvc.perform(get("/api/v1/users/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + access.getValue()))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/users/me").cookie(new Cookie("atona_access", "invalido")))
+        mockMvc.perform(get("/api/v1/users/me").cookie(new Cookie("atona_access", "invalido")))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/users/me").cookie(access))
+        mockMvc.perform(get("/api/v1/users/me").cookie(access))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome").value("Usuário Integração"))
                 .andExpect(jsonPath("$.senha").doesNotExist());
 
-        Cookie csrf = cookie(mockMvc.perform(get("/auth/csrf"))
+        Cookie csrf = cookie(mockMvc.perform(get("/api/v1/auth/csrf"))
                 .andExpect(status().isNoContent())
                 .andReturn().getResponse(), "XSRF-TOKEN");
 
-        mockMvc.perform(post("/auth/refresh").cookie(refresh, csrf))
+        mockMvc.perform(post("/api/v1/auth/refresh").cookie(refresh, csrf))
                 .andExpect(status().isForbidden());
-        MockHttpServletResponse renewed = mockMvc.perform(post("/auth/refresh")
+        MockHttpServletResponse renewed = mockMvc.perform(post("/api/v1/auth/refresh")
                         .cookie(refresh, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()))
                 .andExpect(status().isNoContent())
@@ -80,18 +80,18 @@ class AuthFlowIntegrationTest {
         Cookie newRefresh = cookie(renewed, "atona_refresh");
         assertThat(newRefresh.getValue()).isNotEqualTo(refresh.getValue());
 
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/v1/auth/refresh")
                         .cookie(refresh, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/users/me").cookie(newAccess))
+        mockMvc.perform(get("/api/v1/users/me").cookie(newAccess))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/auth/logout")
+        mockMvc.perform(post("/api/v1/auth/logout")
                         .cookie(newRefresh, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()))
                 .andExpect(status().isNoContent());
-        mockMvc.perform(get("/users/me").cookie(newAccess))
+        mockMvc.perform(get("/api/v1/users/me").cookie(newAccess))
                 .andExpect(status().isUnauthorized());
     }
 

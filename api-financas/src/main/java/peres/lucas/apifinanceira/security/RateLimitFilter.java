@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
+import peres.lucas.apifinanceira.config.ApiPaths;
 import peres.lucas.apifinanceira.exception.ErrorMessage;
 
 import java.io.IOException;
@@ -40,9 +41,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String key = ip + ":" + uri;
 
         boolean allowed;
-        if ("/auth/login".equals(uri) || ("POST".equalsIgnoreCase(method) && "/users".equals(uri))) {
+        if (ApiPaths.AUTH_LOGIN.equals(uri) || ("POST".equalsIgnoreCase(method) && ApiPaths.USERS.equals(uri))) {
             allowed = loginRateLimit.tryConsume(key);
-        } else if ("/auth/refresh".equals(uri)) {
+        } else if (ApiPaths.AUTH_REFRESH.equals(uri)) {
             allowed = authRateLimit.tryConsume(key);
         } else {
             allowed = true;

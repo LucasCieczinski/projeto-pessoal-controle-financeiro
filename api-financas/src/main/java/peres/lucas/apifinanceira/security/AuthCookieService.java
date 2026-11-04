@@ -3,6 +3,7 @@ package peres.lucas.apifinanceira.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import peres.lucas.apifinanceira.config.ApiPaths;
 import peres.lucas.apifinanceira.service.SessionTokens;
 
 import java.time.Duration;
@@ -28,8 +29,8 @@ public class AuthCookieService {
     }
 
     public String refreshCookie(SessionTokens tokens) {
-        // Restringe o refresh token apenas aos endpoints de auth (/auth/*).
-        ResponseCookie.ResponseCookieBuilder cookie = base(REFRESH_COOKIE, tokens.refreshToken(), "/auth");
+        // Restringe o refresh token apenas aos endpoints de auth (/api/v1/auth/*).
+        ResponseCookie.ResponseCookieBuilder cookie = base(REFRESH_COOKIE, tokens.refreshToken(), ApiPaths.AUTH);
         if (tokens.persistent()) {
             cookie.maxAge(Duration.ofMillis(tokens.refreshMaxAgeMs()));
         }
@@ -41,7 +42,7 @@ public class AuthCookieService {
     }
 
     public String clearRefreshCookie() {
-        return base(REFRESH_COOKIE, "", "/auth").maxAge(Duration.ZERO).build().toString();
+        return base(REFRESH_COOKIE, "", ApiPaths.AUTH).maxAge(Duration.ZERO).build().toString();
     }
 
     private ResponseCookie.ResponseCookieBuilder base(String name, String value, String path) {

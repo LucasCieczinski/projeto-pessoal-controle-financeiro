@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import peres.lucas.apifinanceira.config.ApiPaths;
 import peres.lucas.apifinanceira.dto.CreateUserRequestDto;
 import peres.lucas.apifinanceira.dto.UserResponseDto;
 import peres.lucas.apifinanceira.service.UserService;
@@ -14,7 +15,7 @@ import java.security.Principal;
 
 @Tag(name = "Usuários", description = "Cadastro e consulta do usuário autenticado")
 @RestController
-@RequestMapping("/users")
+@RequestMapping(ApiPaths.USERS)
 public class UserController {
 
     private final UserService userService;
@@ -26,7 +27,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody CreateUserRequestDto request) {
         UserResponseDto user = userService.createUser(request);
-        return ResponseEntity.created(URI.create("/users/" + user.id())).body(user);
+        return ResponseEntity.created(URI.create(ApiPaths.USERS + "/" + user.id())).body(user);
     }
 
     @GetMapping("/me")

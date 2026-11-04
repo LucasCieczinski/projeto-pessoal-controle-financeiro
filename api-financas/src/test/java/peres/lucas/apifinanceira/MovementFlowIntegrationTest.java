@@ -36,7 +36,7 @@ class MovementFlowIntegrationTest {
         Cookie bia = login("bia.movimentos@teste.com");
         Cookie csrf = csrf();
 
-        mockMvc.perform(post("/movimentacoes")
+        mockMvc.perform(post("/api/v1/movimentacoes")
                         .cookie(ana, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -51,14 +51,14 @@ class MovementFlowIntegrationTest {
                 .andExpect(jsonPath("$.tipo").value("SAIDA"))
                 .andExpect(jsonPath("$.valor").value(83.4));
 
-        mockMvc.perform(get("/movimentacoes").param("mes", "2025-01").cookie(ana))
+        mockMvc.perform(get("/api/v1/movimentacoes").param("mes", "2025-01").cookie(ana))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].descricao").value("Mercado do bairro"));
-        mockMvc.perform(get("/movimentacoes").param("mes", "2025-01").cookie(bia))
+        mockMvc.perform(get("/api/v1/movimentacoes").param("mes", "2025-01").cookie(bia))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
-        mockMvc.perform(get("/movimentacoes").param("mes", "2025-02").cookie(ana))
+        mockMvc.perform(get("/api/v1/movimentacoes").param("mes", "2025-02").cookie(ana))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
@@ -73,19 +73,19 @@ class MovementFlowIntegrationTest {
                  "categoria":"Alimentação","dataMovimentacao":"2025-01-10"}
                 """;
 
-        mockMvc.perform(get("/movimentacoes").param("mes", "2025-01"))
+        mockMvc.perform(get("/api/v1/movimentacoes").param("mes", "2025-01"))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(post("/movimentacoes").cookie(access)
+        mockMvc.perform(post("/api/v1/movimentacoes").cookie(access)
                         .contentType(MediaType.APPLICATION_JSON).content(movement))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(post("/movimentacoes").cookie(access, csrf)
+        mockMvc.perform(post("/api/v1/movimentacoes").cookie(access, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())
                         .contentType(MediaType.APPLICATION_JSON).content(movement))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.campos.valor").exists());
-        mockMvc.perform(get("/movimentacoes").param("mes", "janeiro").cookie(access))
+        mockMvc.perform(get("/api/v1/movimentacoes").param("mes", "janeiro").cookie(access))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/movimentacoes").cookie(access))
+        mockMvc.perform(get("/api/v1/movimentacoes").cookie(access))
                 .andExpect(status().isBadRequest());
     }
 
@@ -99,33 +99,33 @@ class MovementFlowIntegrationTest {
         String id = createMovement(owner, csrf, "50.00", "SAIDA", "2025-01-10");
         String update = movementJson("25.25", "ENTRADA", "2025-02-10");
 
-        mockMvc.perform(put("/movimentacoes/{id}", id).cookie(owner)
+        mockMvc.perform(put("/api/v1/movimentacoes/{id}", id).cookie(owner)
                         .contentType(MediaType.APPLICATION_JSON).content(update)).andExpect(status().isForbidden());
-        mockMvc.perform(delete("/movimentacoes/{id}", id).cookie(owner)).andExpect(status().isForbidden());
-        mockMvc.perform(put("/movimentacoes/{id}", id).cookie(other, csrf)
+        mockMvc.perform(delete("/api/v1/movimentacoes/{id}", id).cookie(owner)).andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/movimentacoes/{id}", id).cookie(other, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON).content(update))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(delete("/movimentacoes/{id}", id).cookie(other, csrf)
+        mockMvc.perform(delete("/api/v1/movimentacoes/{id}", id).cookie(other, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())).andExpect(status().isNotFound());
-        mockMvc.perform(put("/movimentacoes/{id}", id).cookie(owner, csrf)
+        mockMvc.perform(put("/api/v1/movimentacoes/{id}", id).cookie(owner, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
                         .content(movementJson("-1", "SAIDA", "2025-01-10"))).andExpect(status().isBadRequest());
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-01").cookie(owner))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-01").cookie(owner))
                 .andExpect(jsonPath("$.saldoAcumulado").value(-50));
 
-        mockMvc.perform(put("/movimentacoes/{id}", id).cookie(owner, csrf)
+        mockMvc.perform(put("/api/v1/movimentacoes/{id}", id).cookie(owner, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON).content(update))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.valor").value(25.25));
-        mockMvc.perform(get("/movimentacoes").param("mes", "2025-01").cookie(owner))
+        mockMvc.perform(get("/api/v1/movimentacoes").param("mes", "2025-01").cookie(owner))
                 .andExpect(jsonPath("$.length()").value(0));
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-02").cookie(owner))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-02").cookie(owner))
                 .andExpect(jsonPath("$.saldoAcumulado").value(25.25));
-        mockMvc.perform(delete("/movimentacoes/{id}", id).cookie(owner, csrf)
+        mockMvc.perform(delete("/api/v1/movimentacoes/{id}", id).cookie(owner, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())).andExpect(status().isNoContent());
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-02").cookie(owner))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-02").cookie(owner))
                 .andExpect(jsonPath("$.totalRegistros").value(0)).andExpect(jsonPath("$.saldoAcumulado").value(0));
-        mockMvc.perform(delete("/movimentacoes/{id}", id).cookie(owner, csrf)
+        mockMvc.perform(delete("/api/v1/movimentacoes/{id}", id).cookie(owner, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())).andExpect(status().isNotFound());
     }
 
@@ -142,14 +142,14 @@ class MovementFlowIntegrationTest {
         createMovement(owner, csrf, "999", "ENTRADA", "2025-02-01");
         createMovement(other, csrf, "999", "SAIDA", "2025-01-10");
 
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-01").cookie(owner))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-01").cookie(owner))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.mes").value("2025-01"))
                 .andExpect(jsonPath("$.entradas").value(20.20)).andExpect(jsonPath("$.saidas").value(6.06))
                 .andExpect(jsonPath("$.resultado").value(14.14)).andExpect(jsonPath("$.saldoAnterior").value(100.10))
                 .andExpect(jsonPath("$.saldoAcumulado").value(114.24)).andExpect(jsonPath("$.quantidade").value(7))
                 .andExpect(jsonPath("$.totalRegistros").value(8)).andExpect(jsonPath("$.ultimasMovimentacoes.length()").value(5))
                 .andExpect(jsonPath("$.ultimasMovimentacoes[0].dataMovimentacao").value("2025-01-15"));
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-03").cookie(owner))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-03").cookie(owner))
                 .andExpect(jsonPath("$.quantidade").value(0)).andExpect(jsonPath("$.resultado").value(0))
                 .andExpect(jsonPath("$.saldoAnterior").value(1113.24)).andExpect(jsonPath("$.saldoAcumulado").value(1113.24))
                 .andExpect(jsonPath("$.ultimasMovimentacoes.length()").value(0));
@@ -159,22 +159,22 @@ class MovementFlowIntegrationTest {
     void resumoVazioExigeAutenticacaoEPeriodoValido() throws Exception {
         register("vazia@teste.com");
         Cookie access = login("vazia@teste.com");
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-01"))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-01"))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "0000-01").cookie(access))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "0000-01").cookie(access))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-13").cookie(access))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-13").cookie(access))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/movimentacoes/resumo").param("mes", "2025-01").cookie(access))
+        mockMvc.perform(get("/api/v1/movimentacoes/resumo").param("mes", "2025-01").cookie(access))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.totalRegistros").value(0))
                 .andExpect(jsonPath("$.saldoAcumulado").value(0)).andExpect(jsonPath("$.ultimasMovimentacoes.length()").value(0));
         Cookie csrf = csrf();
-        mockMvc.perform(delete("/movimentacoes/id-invalido").cookie(access, csrf)
+        mockMvc.perform(delete("/api/v1/movimentacoes/id-invalido").cookie(access, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())).andExpect(status().isBadRequest());
     }
 
     private String createMovement(Cookie access, Cookie csrf, String value, String type, String date) throws Exception {
-        String json = mockMvc.perform(post("/movimentacoes").cookie(access, csrf)
+        String json = mockMvc.perform(post("/api/v1/movimentacoes").cookie(access, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()).contentType(MediaType.APPLICATION_JSON)
                         .content(movementJson(value, type, date)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
@@ -189,7 +189,7 @@ class MovementFlowIntegrationTest {
     }
 
     private void register(String email) throws Exception {
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"nome":"Pessoa Teste","email":"%s","senha":"senha123"}
@@ -198,7 +198,7 @@ class MovementFlowIntegrationTest {
     }
 
     private Cookie login(String email) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(post("/auth/login")
+        MockHttpServletResponse response = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"%s","senha":"senha123","remember":false}
@@ -209,7 +209,7 @@ class MovementFlowIntegrationTest {
     }
 
     private Cookie csrf() throws Exception {
-        return cookie(mockMvc.perform(get("/auth/csrf"))
+        return cookie(mockMvc.perform(get("/api/v1/auth/csrf"))
                 .andExpect(status().isNoContent())
                 .andReturn().getResponse(), "XSRF-TOKEN");
     }

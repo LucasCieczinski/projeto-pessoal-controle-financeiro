@@ -19,6 +19,7 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import peres.lucas.apifinanceira.config.ApiPaths;
 import peres.lucas.apifinanceira.repository.AuthSessionRepository;
 
 import java.util.Arrays;
@@ -54,7 +55,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.spa()
                         .csrfTokenRepository(csrfRepository)
-                        .ignoringRequestMatchers("/users", "/auth/login")
+                        .ignoringRequestMatchers(ApiPaths.USERS, ApiPaths.AUTH_LOGIN)
                         .ignoringRequestMatchers(SWAGGER_ROUTES))
                 .cors(Customizer.withDefaults())
                 .headers(headers -> headers
@@ -80,9 +81,13 @@ public class SecurityConfig {
                     } else {
                         auth.requestMatchers(SWAGGER_ROUTES).denyAll();
                     }
-                    auth.requestMatchers(HttpMethod.POST, "/users", "/auth/login", "/auth/refresh", "/auth/logout")
+                    auth.requestMatchers(HttpMethod.POST,
+                                    ApiPaths.USERS,
+                                    ApiPaths.AUTH_LOGIN,
+                                    ApiPaths.AUTH_REFRESH,
+                                    ApiPaths.AUTH_LOGOUT)
                             .permitAll()
-                            .requestMatchers(HttpMethod.GET, "/auth/csrf").permitAll()
+                            .requestMatchers(HttpMethod.GET, ApiPaths.AUTH_CSRF).permitAll()
                             .anyRequest().authenticated();
                 })
                 // Rate limiting em endpoints sensíveis (login, cadastro, refresh)

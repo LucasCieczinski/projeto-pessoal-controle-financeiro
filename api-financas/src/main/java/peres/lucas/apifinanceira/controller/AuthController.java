@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import peres.lucas.apifinanceira.config.ApiPaths;
 import peres.lucas.apifinanceira.dto.LoginDto;
 import peres.lucas.apifinanceira.exception.ErrorMessage;
 import peres.lucas.apifinanceira.security.AuthCookieService;
@@ -27,7 +28,7 @@ import java.util.Optional;
 
 @Tag(name = "Auth", description = "Autenticação, sessão e CSRF")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(ApiPaths.AUTH)
 public class AuthController {
 
     private final AuthService authService;

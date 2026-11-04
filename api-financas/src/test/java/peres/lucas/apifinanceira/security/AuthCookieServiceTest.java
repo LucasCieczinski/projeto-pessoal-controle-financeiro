@@ -14,7 +14,7 @@ class AuthCookieServiceTest {
 
         assertThat(service.accessCookie(tokens)).contains("HttpOnly", "SameSite=Lax", "Path=/")
                 .doesNotContain("Max-Age");
-        assertThat(service.refreshCookie(tokens)).contains("HttpOnly", "SameSite=Lax", "Path=/auth")
+        assertThat(service.refreshCookie(tokens)).contains("HttpOnly", "SameSite=Lax", "Path=/api/v1/auth")
                 .doesNotContain("Max-Age");
     }
 

@@ -40,7 +40,7 @@ class ErrorPayloadContractTest {
         Cookie access = login("contrato.validacao@teste.com");
         Cookie csrf = csrf();
 
-        mockMvc.perform(post("/movimentacoes").cookie(access, csrf)
+        mockMvc.perform(post("/api/v1/movimentacoes").cookie(access, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -51,7 +51,7 @@ class ErrorPayloadContractTest {
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.path").value("/movimentacoes"))
+                .andExpect(jsonPath("$.path").value("/api/v1/movimentacoes"))
                 .andExpect(jsonPath("$.mensagem").value("Dados inválidos"))
                 .andExpect(jsonPath("$.campos").isNotEmpty())
                 .andExpect(jsonPath("$.campos.valor").exists());
@@ -63,14 +63,14 @@ class ErrorPayloadContractTest {
         Cookie access = login("contrato.inexistente@teste.com");
         Cookie csrf = csrf();
 
-        mockMvc.perform(delete("/movimentacoes/{id}", "00000000-0000-0000-0000-000000000000")
+        mockMvc.perform(delete("/api/v1/movimentacoes/{id}", "00000000-0000-0000-0000-000000000000")
                         .cookie(access, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
-                .andExpect(jsonPath("$.path").value("/movimentacoes/00000000-0000-0000-0000-000000000000"))
+                .andExpect(jsonPath("$.path").value("/api/v1/movimentacoes/00000000-0000-0000-0000-000000000000"))
                 .andExpect(jsonPath("$.mensagem").isNotEmpty())
                 .andExpect(jsonPath("$.campos").isEmpty());
     }
@@ -80,36 +80,36 @@ class ErrorPayloadContractTest {
         register("contrato.parametros@teste.com");
         Cookie access = login("contrato.parametros@teste.com");
 
-        mockMvc.perform(get("/movimentacoes").param("mes", "janeiro").cookie(access))
+        mockMvc.perform(get("/api/v1/movimentacoes").param("mes", "janeiro").cookie(access))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.path").value("/movimentacoes"))
+                .andExpect(jsonPath("$.path").value("/api/v1/movimentacoes"))
                 .andExpect(jsonPath("$.mensagem").value("Informe um mês válido no formato AAAA-MM"));
 
         Cookie csrf = csrf();
-        mockMvc.perform(delete("/movimentacoes/{id}", "id-invalido").cookie(access, csrf)
+        mockMvc.perform(delete("/api/v1/movimentacoes/{id}", "id-invalido").cookie(access, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.path").value("/movimentacoes/id-invalido"))
+                .andExpect(jsonPath("$.path").value("/api/v1/movimentacoes/id-invalido"))
                 .andExpect(jsonPath("$.mensagem").value("Parâmetro inválido"));
 
-        mockMvc.perform(post("/movimentacoes").cookie(access, csrf)
+        mockMvc.perform(post("/api/v1/movimentacoes").cookie(access, csrf)
                         .header("X-XSRF-TOKEN", csrf.getValue())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ nao-e-json }"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.path").value("/movimentacoes"))
+                .andExpect(jsonPath("$.path").value("/api/v1/movimentacoes"))
                 .andExpect(jsonPath("$.mensagem").value("JSON inválido"));
     }
 
     private void register(String email) throws Exception {
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"nome":"Pessoa Teste","email":"%s","senha":"senha123"}
@@ -118,7 +118,7 @@ class ErrorPayloadContractTest {
     }
 
     private Cookie login(String email) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(post("/auth/login")
+        MockHttpServletResponse response = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"%s","senha":"senha123","remember":false}
@@ -129,7 +129,7 @@ class ErrorPayloadContractTest {
     }
 
     private Cookie csrf() throws Exception {
-        return cookie(mockMvc.perform(get("/auth/csrf"))
+        return cookie(mockMvc.perform(get("/api/v1/auth/csrf"))
                 .andExpect(status().isNoContent())
                 .andReturn().getResponse(), "XSRF-TOKEN");
     }

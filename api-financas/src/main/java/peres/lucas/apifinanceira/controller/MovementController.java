@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import peres.lucas.apifinanceira.config.ApiPaths;
 import peres.lucas.apifinanceira.dto.CreateMovementRequestDto;
 import peres.lucas.apifinanceira.dto.MovementResponseDto;
 import peres.lucas.apifinanceira.dto.MovementSummaryDto;
@@ -29,7 +30,7 @@ import java.util.UUID;
 @Tag(name = "Movimentações", description = "CRUD de entradas e saídas do usuário autenticado")
 @SecurityRequirement(name = "cookieAuth")
 @RestController
-@RequestMapping("/movimentacoes")
+@RequestMapping(ApiPaths.MOVEMENTS)
 public class MovementController {
 
     private final MovementService movementService;
