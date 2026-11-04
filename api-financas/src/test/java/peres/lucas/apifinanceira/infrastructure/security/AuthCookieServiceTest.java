@@ -1,7 +1,7 @@
 package peres.lucas.apifinanceira.infrastructure.security;
 
 import org.junit.jupiter.api.Test;
-import peres.lucas.apifinanceira.application.service.SessionTokens;
+import peres.lucas.apifinanceira.application.usecase.SessionTokens;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

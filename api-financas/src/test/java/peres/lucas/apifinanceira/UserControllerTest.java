@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import peres.lucas.apifinanceira.adapter.web.controller.UserController;
 import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
 import peres.lucas.apifinanceira.infrastructure.security.SecurityConfig;
-import peres.lucas.apifinanceira.application.service.UserService;
+import peres.lucas.apifinanceira.application.usecase.UserService;
 import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessionRepository;
 import tools.jackson.databind.json.JsonMapper;
 

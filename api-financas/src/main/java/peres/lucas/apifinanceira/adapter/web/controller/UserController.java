@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import peres.lucas.apifinanceira.infrastructure.config.ApiPaths;
 import peres.lucas.apifinanceira.application.dto.CreateUserRequestDto;
 import peres.lucas.apifinanceira.application.dto.UserResponseDto;
-import peres.lucas.apifinanceira.application.service.UserService;
+import peres.lucas.apifinanceira.application.usecase.UserService;
 
 import java.net.URI;
 import java.security.Principal;

@@ -20,8 +20,8 @@ import peres.lucas.apifinanceira.infrastructure.config.ApiPaths;
 import peres.lucas.apifinanceira.application.dto.LoginDto;
 import peres.lucas.apifinanceira.adapter.web.exception.ErrorMessage;
 import peres.lucas.apifinanceira.infrastructure.security.AuthCookieService;
-import peres.lucas.apifinanceira.application.service.AuthService;
-import peres.lucas.apifinanceira.application.service.SessionTokens;
+import peres.lucas.apifinanceira.application.usecase.AuthService;
+import peres.lucas.apifinanceira.application.usecase.SessionTokens;
 
 import java.util.Arrays;
 import java.util.Optional;

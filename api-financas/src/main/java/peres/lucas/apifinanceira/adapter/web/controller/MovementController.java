@@ -19,7 +19,7 @@ import peres.lucas.apifinanceira.application.dto.CreateMovementRequestDto;
 import peres.lucas.apifinanceira.application.dto.MovementResponseDto;
 import peres.lucas.apifinanceira.application.dto.MovementSummaryDto;
 import peres.lucas.apifinanceira.domain.exception.InvalidRequestException;
-import peres.lucas.apifinanceira.application.service.MovementService;
+import peres.lucas.apifinanceira.application.usecase.MovementService;
 
 import java.security.Principal;
 import java.time.YearMonth;

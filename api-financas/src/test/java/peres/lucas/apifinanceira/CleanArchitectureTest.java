@@ -1,9 +1,9 @@
 package peres.lucas.apifinanceira;
 
 import org.junit.jupiter.api.Test;
-import peres.lucas.apifinanceira.application.service.AuthService;
-import peres.lucas.apifinanceira.application.service.MovementService;
-import peres.lucas.apifinanceira.application.service.UserService;
+import peres.lucas.apifinanceira.application.usecase.AuthService;
+import peres.lucas.apifinanceira.application.usecase.MovementService;
+import peres.lucas.apifinanceira.application.usecase.UserService;
 import peres.lucas.apifinanceira.domain.model.AuthSession;
 import peres.lucas.apifinanceira.domain.model.Movement;
 import peres.lucas.apifinanceira.domain.model.MovementTotals;

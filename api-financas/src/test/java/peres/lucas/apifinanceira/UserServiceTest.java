@@ -11,7 +11,7 @@ import peres.lucas.apifinanceira.application.dto.UserResponseDto;
 import peres.lucas.apifinanceira.infrastructure.persistence.entity.UserEntity;
 import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
 import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserRepository;
-import peres.lucas.apifinanceira.application.service.UserService;
+import peres.lucas.apifinanceira.application.usecase.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

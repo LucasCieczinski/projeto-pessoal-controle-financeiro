@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.infrastructure.config.ApiPaths;
-import peres.lucas.apifinanceira.application.service.SessionTokens;
+import peres.lucas.apifinanceira.application.usecase.SessionTokens;
 
 import java.time.Duration;
 

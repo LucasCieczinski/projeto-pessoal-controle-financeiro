@@ -1,4 +1,4 @@
-package peres.lucas.apifinanceira.application.service;
+package peres.lucas.apifinanceira.application.usecase;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

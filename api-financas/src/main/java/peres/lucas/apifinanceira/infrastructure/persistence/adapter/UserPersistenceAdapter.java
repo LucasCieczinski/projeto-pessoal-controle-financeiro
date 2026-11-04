@@ -1,4 +1,4 @@
-package peres.lucas.apifinanceira.infrastructure.persistence;
+package peres.lucas.apifinanceira.infrastructure.persistence.adapter;
 
 import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.domain.model.User;

@@ -1,4 +1,4 @@
-package peres.lucas.apifinanceira.application.service;
+package peres.lucas.apifinanceira.application.usecase;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;

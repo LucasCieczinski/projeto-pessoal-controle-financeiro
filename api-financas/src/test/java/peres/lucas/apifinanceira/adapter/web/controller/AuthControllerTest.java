@@ -14,8 +14,8 @@ import peres.lucas.apifinanceira.infrastructure.persistence.repository.AuthSessi
 import peres.lucas.apifinanceira.infrastructure.security.AuthCookieService;
 import peres.lucas.apifinanceira.infrastructure.security.JwtUtil;
 import peres.lucas.apifinanceira.infrastructure.security.SecurityConfig;
-import peres.lucas.apifinanceira.application.service.AuthService;
-import peres.lucas.apifinanceira.application.service.SessionTokens;
+import peres.lucas.apifinanceira.application.usecase.AuthService;
+import peres.lucas.apifinanceira.application.usecase.SessionTokens;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
