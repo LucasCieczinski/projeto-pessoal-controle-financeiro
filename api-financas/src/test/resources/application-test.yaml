@@ -19,3 +19,10 @@ jwt:
 app:
   cors:
     allowed-origins: http://localhost:4200
+  rate-limit:
+    login-max-attempts: 1000
+    login-window-ms: 300000
+    auth-max-attempts: 1000
+    auth-window-ms: 300000
+  swagger:
+    enabled: true

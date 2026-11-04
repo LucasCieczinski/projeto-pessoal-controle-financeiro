@@ -1,16 +1,22 @@
 package peres.lucas.apifinanceira.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import peres.lucas.apifinanceira.dto.CreateMovementRequestDto;
 import peres.lucas.apifinanceira.dto.MovementResponseDto;
+import peres.lucas.apifinanceira.dto.MovementSummaryDto;
 import peres.lucas.apifinanceira.exception.InvalidRequestException;
 import peres.lucas.apifinanceira.service.MovementService;
 
@@ -19,11 +25,9 @@ import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import peres.lucas.apifinanceira.dto.MovementSummaryDto;
 
+@Tag(name = "Movimentações", description = "CRUD de entradas e saídas do usuário autenticado")
+@SecurityRequirement(name = "cookieAuth")
 @RestController
 @RequestMapping("/movimentacoes")
 public class MovementController {

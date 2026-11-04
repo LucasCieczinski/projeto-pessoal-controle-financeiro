@@ -1,5 +1,8 @@
 package peres.lucas.apifinanceira.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +25,7 @@ import peres.lucas.apifinanceira.service.SessionTokens;
 import java.util.Arrays;
 import java.util.Optional;
 
+@Tag(name = "Auth", description = "Autenticação, sessão e CSRF")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -48,16 +52,19 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @SecurityRequirement(name = "cookieAuth")
     public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
         return authService.refresh(cookie(request, AuthCookieService.REFRESH_COOKIE).orElse(null))
                 .<ResponseEntity<?>>map(tokens -> issued(tokens, response))
                 .orElseGet(() -> {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(new ErrorMessage("Sessão expirada. Entre novamente.", HttpStatus.UNAUTHORIZED.value()));
+                            .body(new ErrorMessage(HttpStatus.UNAUTHORIZED.value(), "Unauthorized",
+                                    request.getRequestURI(), "Sessão expirada. Entre novamente."));
                 });
     }
 
     @PostMapping("/logout")
+    @SecurityRequirement(name = "cookieAuth")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(cookie(request, AuthCookieService.REFRESH_COOKIE).orElse(null));
         clear(response);

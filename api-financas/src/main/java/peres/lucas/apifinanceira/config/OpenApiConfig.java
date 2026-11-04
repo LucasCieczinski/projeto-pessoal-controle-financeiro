@@ -21,13 +21,13 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("API Financeira")
                         .version("1.0.0")
-                        .description("Documentação das rotas da API Financeira com autenticação via Cookie."))
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+                        .description("Documentação das rotas da API Financeira com autenticação via Cookie HttpOnly."))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
                                 new SecurityScheme()
-                                        .name(cookieName)            // Nome do cookie lido no filtro
-                                        .type(SecurityScheme.Type.APIKEY) // Define como API Key
-                                        .in(SecurityScheme.In.COOKIE)));  // Indica que o token viaja via Cookie
+                                        .name(cookieName)
+                                        .type(SecurityScheme.Type.APIKEY)
+                                        .in(SecurityScheme.In.COOKIE)
+                                        .description("Cookie HttpOnly de acesso: " + cookieName)));
     }
 }

@@ -20,3 +20,17 @@ app:
   cors:
     # Sem default: exige a(s) origem(ns) reais do front-end, separadas por vírgula.
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
+  rate-limit:
+    login-max-attempts: 5
+    login-window-ms: 300000
+    auth-max-attempts: 20
+    auth-window-ms: 300000
+  swagger:
+    # Swagger desabilitado em produção por segurança.
+    enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
