@@ -1,19 +1,17 @@
 package peres.lucas.apifinanceira.infrastructure.persistence.adapter;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import peres.lucas.apifinanceira.domain.model.User;
 import peres.lucas.apifinanceira.domain.port.UserRepositoryPort;
+import peres.lucas.apifinanceira.infrastructure.config.CacheConfig;
 import peres.lucas.apifinanceira.infrastructure.persistence.entity.UserEntity;
 import peres.lucas.apifinanceira.infrastructure.persistence.repository.UserJpaRepository;
 
 import java.util.Optional;
 
-/**
- * Adaptador de infraestrutura JPA que implementa a porta {@link UserRepositoryPort}.
- * <p>
- * Converte transparentemente entre o modelo de domínio puro {@link User} e a
- * entidade de banco de dados {@link UserEntity}.
- */
+
 @Component
 public class UserPersistenceAdapter implements UserRepositoryPort {
 
@@ -29,11 +27,13 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     }
 
     @Override
+    @Cacheable(value = CacheConfig.USER_BY_EMAIL_CACHE, key = "#email", unless = "#result == null")
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email).map(this::toDomain);
     }
 
     @Override
+    @CacheEvict(value = CacheConfig.USER_BY_EMAIL_CACHE, key = "#user.email")
     public User save(User user) {
         UserEntity entity = toEntity(user);
         UserEntity saved = userRepository.save(entity);
