@@ -73,14 +73,17 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> {
-                    // Permite redirecionamentos internos (crucial para o index.html do Swagger funcionar no Spring 3/4)
                     auth.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE).permitAll();
-                    // Libera ou bloqueia o acesso às rotas do Swagger conforme configuração do ambiente
                     if (swaggerEnabled) {
                         auth.requestMatchers(SWAGGER_ROUTES).permitAll();
                     } else {
                         auth.requestMatchers(SWAGGER_ROUTES).denyAll();
                     }
+                    auth.requestMatchers(HttpMethod.GET,
+                            "/actuator/health",
+                            "/actuator/info"
+                    ).permitAll();
+
                     auth.requestMatchers(HttpMethod.POST,
                                     ApiPaths.USERS,
                                     ApiPaths.AUTH_LOGIN,
@@ -90,9 +93,7 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.GET, ApiPaths.AUTH_CSRF).permitAll()
                             .anyRequest().authenticated();
                 })
-                // Rate limiting em endpoints sensíveis (login, cadastro, refresh)
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-                // Valida JWT de acesso via cookie HttpOnly
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, sessionRepository),
                         UsernamePasswordAuthenticationFilter.class);
 

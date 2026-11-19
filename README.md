@@ -64,10 +64,26 @@ Em vez do padrão vulnerável de armazenar tokens JWT no `localStorage` do naveg
 
 ---
 
-### 4. Qualidade, Testes & CI/CD
-- **Backend (`JUnit 5` + `MockMvc` + `Mockito` + `H2`):** Testes unitários de domínio, testes de adaptadores (incluindo simulação do Redis via Mockito), validação de arquitetura (`CleanArchitectureTest`) e testes de integração de ponta a ponta dos fluxos de autenticação, CSRF, contrato de erros e movimentações.
+### 4. Observabilidade, Qualidade, Testes & CI/CD
+- **Observabilidade (`Spring Boot Actuator` + `Micrometer` + `MDC`):**
+  - `CorrelationIdFilter` injetando e propagando `X-Correlation-Id` em todas as requisições HTTP e logs (`[corrId=...]`).
+  - Endpoints `/actuator/health` e `/actuator/info` públicos para *health probes*, e `/actuator/metrics` protegido por autenticação (incluindo métricas de *hit/miss* do cache Caffeine).
+- **Backend (`JUnit 5` + `MockMvc` + `Mockito` + `H2`):** Testes unitários de domínio, testes de adaptadores (incluindo simulação do Redis via Mockito), validação de arquitetura (`CleanArchitectureTest`) e testes de integração de ponta a ponta dos fluxos de autenticação, CSRF, observabilidade, contrato de erros e movimentações.
 - **Frontend (`Angular 21` + `Vitest`):** Testes unitários e de integração de componentes, guardas de rota, interceptors de sessão/erro e serviços.
 - **Integração Contínua (`GitHub Actions`):** Pipeline em `.github/workflows/ci.yml` executando builds e suítes de teste de Backend (Java 21) e Frontend (Node 22) em paralelo a cada push/PR.
+
+---
+
+### 5. Governança Arquitetural — ADRs (Architecture Decision Records)
+Todas as decisões estruturais de engenharia, segurança e performance do projeto estão documentadas no diretório [`docs/adr/`](./docs/adr/):
+
+| ADR | Título / Decisão | Status |
+| :--- | :--- | :--- |
+| [**ADR-000**](./docs/adr/ADR-000-template-padrao.md) | Template Padrão para Registro de Decisões Arquiteturais do Sistema | Modelo |
+| [**ADR-001**](./docs/adr/ADR-001-clean-architecture-e-ports-and-adapters.md) | Adoção de Clean Architecture e Hexagonal (Ports & Adapters) com Fitness Function | Aceito |
+| [**ADR-002**](./docs/adr/ADR-002-seguranca-sessao-cookies-httponly-e-csrf.md) | Arquitetura de Sessão Web Segura com Cookies `HttpOnly`, Refresh Token Rotation e CSRF | Aceito |
+| [**ADR-003**](./docs/adr/ADR-003-rate-limiting-hibrido-redis-lua-e-cache-caffeine.md) | Rate Limiting Híbrido (In-Memory vs. Redis Lua Script) e Cache L1 com Caffeine | Aceito |
+| [**ADR-004**](./docs/adr/ADR-004-monolito-modular-vs-microsservicos.md) | Estratégia de Monólito Modular vs. Microsserviços e Observabilidade | Aceito |
 
 ---
 
@@ -86,6 +102,8 @@ Em vez do padrão vulnerável de armazenar tokens JWT no `localStorage` do naveg
 | `POST` | `/api/v1/movimentacoes` | Registra nova entrada ou saída financeira | Autenticado + CSRF |
 | `PUT` | `/api/v1/movimentacoes/{id}` | Atualiza movimentação pertencente ao usuário | Autenticado + CSRF |
 | `DELETE` | `/api/v1/movimentacoes/{id}` | Remove movimentação pertencente ao usuário | Autenticado + CSRF |
+| `GET` | `/actuator/health` | Health check da aplicação (status UP/DOWN) | Público |
+| `GET` | `/actuator/metrics` | Métricas da JVM, HikariCP e Cache Caffeine (Micrometer) | Autenticado (Cookie JWT) |
 
 ---
 
@@ -128,7 +146,8 @@ npm start
 
 ## 🗺️ Roadmap de Evolução (Ondas de Produto & Engenharia)
 
-- [x] **Onda 1 — Fundação & Hardening:** Autenticação com cookies `HttpOnly` + Refresh rotativo + CSRF, CRUD completo de movimentações por competência, resumo financeiro mensal/acumulado, tratamento global de erros, versionamento `/api/v1`, CI/CD, refatoração para Clean Architecture / Hexagonal, Rate Limit (In-Memory / Redis Lua) e Cache com Caffeine.
-- [ ] **Pré-Onda 2 (Em andamento):** Observabilidade com Spring Boot Actuator, métricas customizadas, Correlation ID nos logs e documentação de decisões arquiteturais (ADRs).
+- [x] **Onda 1 — Fundação & Hardening:** Autenticação com cookies `HttpOnly` + Refresh rotativo + CSRF, CRUD completo de movimentações por competência, resumo financeiro mensal/acumulado e tratamento global de erros.
+- [x] **Engenharia & Arquitetura (Pré-Onda 2):** Versionamento `/api/v1`, CI/CD no GitHub Actions, refatoração completa para Clean Architecture / Hexagonal com Fitness Function, Rate Limit (In-Memory / Redis Lua), Cache L1 com Caffeine, Observabilidade (Actuator, Micrometer, Correlation ID no MDC) e documentação de decisões arquiteturais (ADRs).
+- [ ] **Melhorias Desejáveis de DevSecOps:** Cobertura de testes automatizada com JaCoCo no CI, verificação de pacote `.jar` e auditoria automática de dependências (Dependabot).
 - [ ] **Onda 2 — Planejamento Financeiro:** Gestão de fontes de renda, cartões de crédito, dívidas/parcelamentos e gastos fixos/recorrentes.
 - [ ] **Estudos Futuros:** Exploração de integração via Open Finance e arquitetura orientada a eventos.
