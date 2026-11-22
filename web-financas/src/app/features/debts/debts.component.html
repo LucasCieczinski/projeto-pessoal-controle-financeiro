@@ -1,0 +1,334 @@
+<main class="debts-page">
+  <div class="page-width">
+    <app-private-header context="Dívidas e parcelamentos" (logoutRequested)="logout()" />
+
+    @if (sessionError) {
+      <p class="page-alert" role="alert">{{ sessionError }}</p>
+    }
+
+    <nav class="breadcrumbs" aria-label="Você está aqui">
+      <a routerLink="/inicio">Resumo</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Dívidas e parcelamentos</span>
+    </nav>
+
+    <section class="page-intro" aria-labelledby="debts-title">
+      <div class="intro-copy">
+        <p class="welcome-label">CONTROLE DE PASSIVOS · ONDA 2</p>
+        <h1 id="debts-title">Dívidas e parcelamentos</h1>
+        <p class="intro-lead">Acompanhe seus passivos, visualize o progresso das parcelas e registre cada evolução rumo à quitação.</p>
+      </div>
+      <div class="intro-actions">
+        <button class="primary-action" type="button" (click)="openDebtEditor()">
+          <span aria-hidden="true">+</span> Nova dívida
+        </button>
+      </div>
+    </section>
+
+    @if (successMessage) {
+      <p class="success-alert" role="status">{{ successMessage }}</p>
+    }
+
+    @if (isLoading) {
+      <section class="state-card loading-state" role="status">
+        <span class="loading-mark" aria-hidden="true"></span>
+        <p>Carregando suas dívidas e parcelamentos...</p>
+      </section>
+    } @else if (loadError) {
+      <section class="state-card error-state" role="alert">
+        <span class="state-symbol" aria-hidden="true">!</span>
+        <h2>Não foi possível carregar suas dívidas</h2>
+        <p>{{ loadError }}</p>
+        <button type="button" class="text-action" (click)="loadDebts()">Tentar novamente <span aria-hidden="true">↗</span></button>
+      </section>
+    } @else {
+      <section class="liabilities-summary" aria-label="Resumo de passivos">
+        <div class="kpi-card kpi-card--active">
+          <dt><span class="summary-dot active" aria-hidden="true"></span> Total em dívidas ativas</dt>
+          <dd class="kpi-value active">{{ formatMoney(totalActiveDebtsAmount) }}</dd>
+          <p class="kpi-hint">Soma dos compromissos em aberto ou atrasados</p>
+        </div>
+
+        <div class="kpi-card kpi-card--count">
+          <dt><span class="summary-dot count" aria-hidden="true"></span> Situação dos passivos</dt>
+          <dd class="kpi-value">{{ activeDebtsCount }} {{ activeDebtsCount === 1 ? 'ativa' : 'ativas' }} · {{ settledDebtsCount }} {{ settledDebtsCount === 1 ? 'quitada' : 'quitadas' }}</dd>
+          <p class="kpi-hint">
+            @if (overdueDebtsCount > 0) {
+              {{ overdueDebtsCount }} {{ overdueDebtsCount === 1 ? 'dívida atrasada exige atenção' : 'dívidas atrasadas exigem atenção' }}
+            } @else {
+              Nenhuma dívida em atraso no momento
+            }
+          </p>
+        </div>
+
+        <div class="kpi-card kpi-card--progress">
+          <dt><span class="summary-dot progress" aria-hidden="true"></span> Progresso geral de parcelas</dt>
+          <dd class="kpi-value progress">{{ overallProgressPercent }}% concluído</dd>
+          <p class="kpi-hint">{{ paidInstallmentsSum }} de {{ totalInstallmentsSum }} parcelas pagas no total</p>
+        </div>
+      </section>
+
+      <section class="debts-panel" aria-labelledby="debts-list-title">
+        <header class="panel-header">
+          <div>
+            <h2 id="debts-list-title">Carteira de dívidas</h2>
+            <p>{{ filteredDebts.length }} {{ filteredDebts.length === 1 ? 'registro exibido' : 'registros exibidos' }}</p>
+          </div>
+
+          <div class="filter-tabs" role="group" aria-label="Filtrar dívidas por status">
+            <button
+              type="button"
+              class="filter-tab"
+              [class.active]="statusFilter() === 'TODOS'"
+              [attr.aria-pressed]="statusFilter() === 'TODOS'"
+              (click)="setStatusFilter('TODOS')">
+              Todas ({{ debts.length }})
+            </button>
+            <button
+              type="button"
+              class="filter-tab"
+              [class.active]="statusFilter() === 'ABERTA'"
+              [attr.aria-pressed]="statusFilter() === 'ABERTA'"
+              (click)="setStatusFilter('ABERTA')">
+              Abertas
+            </button>
+            <button
+              type="button"
+              class="filter-tab"
+              [class.active]="statusFilter() === 'ATRASADA'"
+              [attr.aria-pressed]="statusFilter() === 'ATRASADA'"
+              (click)="setStatusFilter('ATRASADA')">
+              Atrasadas
+            </button>
+            <button
+              type="button"
+              class="filter-tab"
+              [class.active]="statusFilter() === 'QUITADA'"
+              [attr.aria-pressed]="statusFilter() === 'QUITADA'"
+              (click)="setStatusFilter('QUITADA')">
+              Quitadas
+            </button>
+          </div>
+        </header>
+
+        @if (debts.length === 0) {
+          <div class="empty-panel">
+            <h3>Nenhuma dívida ou parcelamento cadastrado</h3>
+            <p>Registre financiamentos, empréstimos ou acordos parcelados para acompanhar cada parcela até a quitação.</p>
+            <button type="button" class="text-action" (click)="openDebtEditor()">Cadastrar primeira dívida</button>
+          </div>
+        } @else if (filteredDebts.length === 0) {
+          <div class="empty-panel">
+            <h3>Nenhuma dívida encontrada neste filtro</h3>
+            <p>Altere o filtro de status acima para visualizar outros compromissos cadastrados.</p>
+            <button type="button" class="text-action" (click)="setStatusFilter('TODOS')">Ver todas as dívidas</button>
+          </div>
+        } @else {
+          <ul class="debt-list" aria-label="Lista de dívidas e parcelamentos">
+            @for (debt of filteredDebts; track debt.id) {
+              <li class="debt-row" [class.settled]="debt.status === 'QUITADA'">
+                <div class="debt-main">
+                  <div class="debt-title-row">
+                    <h3>{{ debt.credor }}</h3>
+                    <span
+                      class="status-badge"
+                      [class.open]="debt.status === 'ABERTA'"
+                      [class.overdue]="debt.status === 'ATRASADA'"
+                      [class.settled]="debt.status === 'QUITADA'">
+                      {{ statusLabel(debt.status) }}
+                    </span>
+                  </div>
+
+                  <strong class="debt-amount">{{ formatMoney(debt.valorTotal) }}</strong>
+
+                  <div class="progress-block">
+                    <div class="progress-meta">
+                      <span>{{ debtProgressCopy(debt) }}</span>
+                      @if (debt.totalParcelas !== null) {
+                        <strong>{{ debtProgressPercent(debt) }}%</strong>
+                      }
+                    </div>
+                    <div
+                      class="progress-track"
+                      role="progressbar"
+                      [attr.aria-label]="'Progresso de ' + debt.credor"
+                      [attr.aria-valuenow]="debtProgressPercent(debt)"
+                      aria-valuemin="0"
+                      aria-valuemax="100">
+                      <span
+                        class="progress-fill"
+                        [class.settled]="debt.status === 'QUITADA'"
+                        [class.overdue]="debt.status === 'ATRASADA'"
+                        [style.width.%]="debtProgressPercent(debt)"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  @if (debt.status !== 'QUITADA') {
+                    <button
+                      type="button"
+                      class="pay-action"
+                      [disabled]="payingDebtId === debt.id"
+                      [attr.aria-label]="'Pagar parcela de ' + debt.credor"
+                      (click)="payInstallment(debt)">
+                      {{ payingDebtId === debt.id ? 'Registrando...' : 'Pagar parcela' }}
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    [attr.aria-label]="'Editar ' + debt.credor"
+                    (click)="openDebtEditor(debt)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="delete-action"
+                    [attr.aria-label]="'Excluir ' + debt.credor"
+                    (click)="requestDeleteDebt(debt)">
+                    Excluir
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+
+    <p class="page-footnote">
+      <span>À TONA / DÍVIDAS E PARCELAMENTOS</span> O controle de passivos organiza seus compromissos e não altera automaticamente o saldo realizado do livro-caixa.
+    </p>
+  </div>
+
+  <app-modal
+    [(open)]="debtEditorOpen"
+    [title]="editingDebt ? 'Editar dívida' : 'Nova dívida'"
+    [description]="editingDebt ? 'Atualize os dados deste passivo ou parcelamento.' : 'Registre um compromisso financeiro ou parcelamento para acompanhar sua quitação.'"
+    [confirmLabel]="editingDebt ? 'Salvar alterações' : 'Salvar dívida'"
+    busyLabel="Salvando..."
+    [busy]="isSavingDebt"
+    submitForm="debt-form"
+    (closed)="debtSaveError = ''">
+    <form #debtFormElement id="debt-form" [formGroup]="debtForm" (ngSubmit)="saveDebt()" novalidate>
+      <fieldset class="editor-fields" [disabled]="isSavingDebt">
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label for="debt-creditor">Credor ou descrição da dívida</label>
+            <input
+              id="debt-creditor"
+              modalInitialFocus
+              formControlName="credor"
+              type="text"
+              maxlength="100"
+              placeholder="Ex.: Financiamento Banco Itaú"
+              autocomplete="off"
+              [attr.aria-invalid]="debtFieldInvalid('credor')"
+              [attr.aria-describedby]="debtFieldInvalid('credor') ? 'debt-creditor-error' : null" />
+            @if (debtFieldInvalid('credor')) {
+              <p class="field-error" id="debt-creditor-error">Informe o nome do credor (máx. 100 caracteres).</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="debt-amount">Valor total</label>
+            <div class="money-input">
+              <span>R$</span>
+              <input
+                id="debt-amount"
+                formControlName="valorTotal"
+                type="text"
+                inputmode="decimal"
+                maxlength="18"
+                placeholder="0,00"
+                autocomplete="off"
+                (blur)="formatDebtAmountField()"
+                [attr.aria-invalid]="debtFieldInvalid('valorTotal')"
+                [attr.aria-describedby]="debtFieldInvalid('valorTotal') ? 'debt-amount-error' : 'debt-amount-hint'" />
+            </div>
+            @if (debtFieldInvalid('valorTotal')) {
+              <p class="field-error" id="debt-amount-error">Informe um valor maior que zero, como 1.200,00.</p>
+            } @else {
+              <p class="field-hint" id="debt-amount-hint">Use vírgula para os centavos.</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="debt-status">Status</label>
+            <select id="debt-status" formControlName="status">
+              <option value="ABERTA">Aberta</option>
+              <option value="ATRASADA">Atrasada</option>
+              <option value="QUITADA">Quitada</option>
+            </select>
+            <p class="field-hint">Situação atual do compromisso.</p>
+          </div>
+
+          <div class="form-field">
+            <label for="debt-total-installments">Total de parcelas (opcional)</label>
+            <input
+              id="debt-total-installments"
+              formControlName="totalParcelas"
+              type="number"
+              min="1"
+              placeholder="Ex.: 12"
+              [attr.aria-invalid]="debtFieldInvalid('totalParcelas')"
+              [attr.aria-describedby]="debtFieldInvalid('totalParcelas') ? 'debt-total-error' : 'debt-total-hint'" />
+            @if (debtFieldInvalid('totalParcelas')) {
+              <p class="field-error" id="debt-total-error">Informe um número inteiro maior ou igual a 1, ou deixe em branco.</p>
+            } @else {
+              <p class="field-hint" id="debt-total-hint">Deixe vazio para pagamento único.</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="debt-paid-installments">Parcelas pagas</label>
+            <input
+              id="debt-paid-installments"
+              formControlName="parcelasPagas"
+              type="number"
+              min="0"
+              placeholder="0"
+              [attr.aria-invalid]="debtFieldInvalid('parcelasPagas')"
+              [attr.aria-describedby]="debtFieldInvalid('parcelasPagas') ? 'debt-paid-error' : 'debt-paid-hint'" />
+            @if (debtFieldInvalid('parcelasPagas')) {
+              <p class="field-error" id="debt-paid-error">
+                @if (debtForm.hasError('paidExceedsTotal')) {
+                  As parcelas pagas não podem superar o total de parcelas.
+                } @else {
+                  Informe um número inteiro maior ou igual a zero.
+                }
+              </p>
+            } @else {
+              <p class="field-hint" id="debt-paid-hint">Quantidade já quitada.</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+      @if (debtSaveError) {
+        <p class="save-error" role="alert">{{ debtSaveError }}</p>
+      }
+    </form>
+  </app-modal>
+
+  <app-modal
+    [(open)]="debtDeleteOpen"
+    title="Excluir dívida?"
+    description="Este passivo será removido do seu controle de dívidas e parcelamentos. Essa ação não pode ser desfeita."
+    confirmLabel="Excluir dívida"
+    cancelLabel="Manter dívida"
+    tone="danger"
+    busyLabel="Excluindo..."
+    [busy]="isDeletingDebt"
+    (confirmed)="deleteDebt()">
+    @if (deletingDebt; as debt) {
+      <div class="delete-preview">
+        <p>{{ statusLabel(debt.status) }} · {{ debtProgressCopy(debt) }}</p>
+        <h3>{{ debt.credor }}</h3>
+        <strong>{{ formatMoney(debt.valorTotal) }}</strong>
+      </div>
+    }
+    @if (debtDeleteError) {
+      <p class="save-error" role="alert">{{ debtDeleteError }}</p>
+    }
+  </app-modal>
+</main>

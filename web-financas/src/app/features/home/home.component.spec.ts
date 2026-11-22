@@ -6,6 +6,8 @@ import { vi } from 'vitest';
 import { AuthService } from '../../core/auth/auth.service';
 import { MovementSummary } from '../../core/movements/movement.models';
 import { MovementService } from '../../core/movements/movement.service';
+import { Income, RecurringExpense } from '../../core/planning/planning.models';
+import { PlanningService } from '../../core/planning/planning.service';
 import { HomeComponent } from './home.component';
 
 const empty: MovementSummary = {
@@ -13,12 +15,23 @@ const empty: MovementSummary = {
   saldoAcumulado: 0, quantidade: 0, totalRegistros: 0, ultimasMovimentacoes: [],
 };
 
-async function setup(summary: () => ReturnType<MovementService['summary']>) {
+async function setup(
+  summary: () => ReturnType<MovementService['summary']>,
+  incomes: Income[] = [],
+  recurringExpenses: RecurringExpense[] = [],
+) {
   await TestBed.configureTestingModule({
     imports: [HomeComponent],
     providers: [
       provideRouter([]),
       { provide: MovementService, useValue: { summary } },
+      {
+        provide: PlanningService,
+        useValue: {
+          listIncomes: () => of(incomes),
+          listRecurringExpenses: () => of(recurringExpenses),
+        },
+      },
       { provide: AuthService, useValue: {
         currentUser: () => of({ id: 'interno', nome: 'Ana Silva', email: 'ana@email.com' }),
         logout: () => of(void 0),
@@ -83,5 +96,28 @@ describe('HomeComponent', () => {
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent).toContain('O primeiro registro');
     expect(summary).toHaveBeenCalledTimes(3);
+  });
+
+  it('exibe indicador de Renda Prevista vs. Gastos Fixos com link para /planejamento', async () => {
+    const fixture = await setup(
+      () => of({ ...empty, totalRegistros: 1, entradas: 4000, saidas: 1500, resultado: 2500, saldoAcumulado: 2500 }),
+      [
+        { id: 'i1', fonte: 'Salário', valorBase: 4000, ativo: true },
+        { id: 'i2', fonte: 'Bônus inativo', valorBase: 1000, ativo: false },
+      ],
+      [
+        { id: 'e1', descricao: 'Aluguel', valor: 1200, diaVencimento: 10, ativo: true },
+        { id: 'e2', descricao: 'Academia inativa', valor: 150, diaVencimento: 15, ativo: false },
+      ],
+    );
+    const page = fixture.nativeElement as HTMLElement;
+    const planningCard = page.querySelector('.planning-overview-card')!;
+    expect(planningCard).toBeTruthy();
+    expect(planningCard.textContent).toContain('Planejamento fixo mensal');
+    expect(planningCard.textContent).toContain('4.000,00');
+    expect(planningCard.textContent).toContain('1.200,00');
+    expect(planningCard.textContent).toContain('2.800,00');
+    expect(planningCard.textContent).toContain('30% da renda comprometida');
+    expect(planningCard.querySelector('a')?.getAttribute('href')).toBe('/planejamento');
   });
 });

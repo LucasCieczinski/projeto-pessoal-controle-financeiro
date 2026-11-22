@@ -111,6 +111,23 @@ Para manter 100% de aderência arquitetural durante o desenvolvimento assistido 
 | `POST` | `/api/v1/movimentacoes` | Registra nova entrada ou saída financeira | Autenticado + CSRF |
 | `PUT` | `/api/v1/movimentacoes/{id}` | Atualiza movimentação pertencente ao usuário | Autenticado + CSRF |
 | `DELETE` | `/api/v1/movimentacoes/{id}` | Remove movimentação pertencente ao usuário | Autenticado + CSRF |
+| `GET` | `/api/v1/rendas` | Lista fontes de renda previstas do usuário | Autenticado (Cookie JWT) |
+| `POST` | `/api/v1/rendas` | Cadastra nova fonte de renda prevista | Autenticado + CSRF |
+| `PUT` | `/api/v1/rendas/{id}` | Atualiza fonte de renda pertencente ao usuário | Autenticado + CSRF |
+| `DELETE` | `/api/v1/rendas/{id}` | Remove fonte de renda pertencente ao usuário | Autenticado + CSRF |
+| `GET` | `/api/v1/gastos-recorrentes` | Lista gastos recorrentes ordenados por dia de vencimento | Autenticado (Cookie JWT) |
+| `POST` | `/api/v1/gastos-recorrentes` | Cadastra novo gasto fixo/recorrente mensal | Autenticado + CSRF |
+| `PUT` | `/api/v1/gastos-recorrentes/{id}` | Atualiza gasto recorrente pertencente ao usuário | Autenticado + CSRF |
+| `DELETE` | `/api/v1/gastos-recorrentes/{id}` | Remove gasto recorrente pertencente ao usuário | Autenticado + CSRF |
+| `GET` | `/api/v1/dividas` | Lista dívidas e parcelamentos do usuário | Autenticado (Cookie JWT) |
+| `POST` | `/api/v1/dividas` | Cadastra nova dívida ou parcelamento | Autenticado + CSRF |
+| `PUT` | `/api/v1/dividas/{id}` | Atualiza dívida pertencente ao usuário | Autenticado + CSRF |
+| `PATCH` | `/api/v1/dividas/{id}/pagar-parcela` | Registra pagamento de parcela com transição automática para `QUITADA` | Autenticado + CSRF |
+| `DELETE` | `/api/v1/dividas/{id}` | Remove dívida pertencente ao usuário | Autenticado + CSRF |
+| `GET` | `/api/v1/cartoes` | Lista cartões de crédito do usuário ordenados por nome | Autenticado (Cookie JWT) |
+| `POST` | `/api/v1/cartoes` | Cadastra novo cartão de crédito | Autenticado + CSRF |
+| `PUT` | `/api/v1/cartoes/{id}` | Atualiza cartão de crédito pertencente ao usuário | Autenticado + CSRF |
+| `DELETE` | `/api/v1/cartoes/{id}` | Remove cartão de crédito pertencente ao usuário | Autenticado + CSRF |
 | `GET` | `/actuator/health` | Health check da aplicação (status UP/DOWN) | Público |
 | `GET` | `/actuator/metrics` | Métricas da JVM, HikariCP e Cache Caffeine (Micrometer) | Autenticado (Cookie JWT) |
 
@@ -157,6 +174,6 @@ npm start
 
 - [x] **Onda 1 — Fundação & Hardening:** Autenticação com cookies `HttpOnly` + Refresh rotativo + CSRF, CRUD completo de movimentações por competência, resumo financeiro mensal/acumulado e tratamento global de erros.
 - [x] **Engenharia & Arquitetura (Pré-Onda 2):** Versionamento `/api/v1`, CI/CD no GitHub Actions, refatoração completa para Clean Architecture / Hexagonal com Fitness Function, Rate Limit (In-Memory / Redis Lua), Cache L1 com Caffeine, Observabilidade (Actuator, Micrometer, Correlation ID no MDC) e documentação de decisões arquiteturais (ADRs).
-- [ ] **Melhorias Desejáveis de DevSecOps:** Cobertura de testes automatizada com JaCoCo no CI, verificação de pacote `.jar` e auditoria automática de dependências (Dependabot).
-- [ ] **Onda 2 — Planejamento Financeiro:** Gestão de fontes de renda, cartões de crédito, dívidas/parcelamentos e gastos fixos/recorrentes.
+- [x] **Melhorias Desejáveis de DevSecOps:** Cobertura de testes automatizada com JaCoCo no CI (>= 80%), verificação de pacote `.jar` e auditoria automática de dependências (Dependabot).
+- [x] **Onda 2 — Planejamento Financeiro:** Gestão completa de fontes de renda (`/api/v1/rendas`), gastos fixos/recorrentes (`/api/v1/gastos-recorrentes`), dívidas/parcelamentos (`/api/v1/dividas`) e cartões de crédito (`/api/v1/cartoes`), além das telas `/planejamento`, `/dividas` e `/cartoes`.
 - [ ] **Estudos Futuros:** Exploração de integração via Open Finance e arquitetura orientada a eventos.

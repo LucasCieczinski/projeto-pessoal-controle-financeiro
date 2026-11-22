@@ -9,10 +9,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import peres.lucas.apifinanceira.domain.exception.CreditCardNotFoundException;
+import peres.lucas.apifinanceira.domain.exception.DebtNotFoundException;
 import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
+import peres.lucas.apifinanceira.domain.exception.IncomeNotFoundException;
 import peres.lucas.apifinanceira.domain.exception.InvalidCredentialException;
 import peres.lucas.apifinanceira.domain.exception.InvalidRequestException;
 import peres.lucas.apifinanceira.domain.exception.MovementNotFoundException;
+import peres.lucas.apifinanceira.domain.exception.RecurringExpenseNotFoundException;
 import peres.lucas.apifinanceira.domain.exception.UserNotFoundException;
 
 import java.util.LinkedHashMap;
@@ -25,6 +29,50 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MovementNotFoundException.class)
     public ResponseEntity<ErrorMessage> handleMovementNotFound(MovementNotFoundException e, HttpServletRequest request) {
+        ErrorMessage body = new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                request.getRequestURI(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(IncomeNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleIncomeNotFound(IncomeNotFoundException e, HttpServletRequest request) {
+        ErrorMessage body = new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                request.getRequestURI(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(RecurringExpenseNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleRecurringExpenseNotFound(RecurringExpenseNotFoundException e, HttpServletRequest request) {
+        ErrorMessage body = new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                request.getRequestURI(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(DebtNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleDebtNotFound(DebtNotFoundException e, HttpServletRequest request) {
+        ErrorMessage body = new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                request.getRequestURI(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(CreditCardNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleCreditCardNotFound(CreditCardNotFoundException e, HttpServletRequest request) {
         ErrorMessage body = new ErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",

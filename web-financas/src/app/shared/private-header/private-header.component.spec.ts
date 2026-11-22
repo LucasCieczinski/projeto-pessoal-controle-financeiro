@@ -1,12 +1,16 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { PrivateHeaderComponent } from './private-header.component';
+
+@Component({ template: '' })
+class DummyRouteComponent {}
 
 describe('PrivateHeaderComponent', () => {
   async function createFixture() {
     await TestBed.configureTestingModule({
       imports: [PrivateHeaderComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([{ path: 'cartoes', component: DummyRouteComponent }])],
     }).compileComponents();
     const fixture = TestBed.createComponent(PrivateHeaderComponent);
     fixture.detectChanges();
@@ -40,23 +44,26 @@ describe('PrivateHeaderComponent', () => {
     expect(button.getAttribute('title')).toBe('Recolher navegação');
   });
 
-  it('expõe atalho rápido e links da Onda 2 desabilitados na sidebar', async () => {
+  it('expõe o link Cartões na navegação principal, atalho rápido e remove itens "Em breve"', async () => {
     const fixture = await createFixture();
     const page = fixture.nativeElement as HTMLElement;
+
+    const navLinks = Array.from(page.querySelectorAll<HTMLAnchorElement>('.private-nav a'));
+    expect(navLinks.map((link) => link.getAttribute('href'))).toEqual([
+      '/inicio',
+      '/movimentacoes',
+      '/planejamento',
+      '/dividas',
+      '/cartoes',
+    ]);
+    expect(navLinks[4].textContent).toContain('Cartões');
 
     const quickAction = page.querySelector<HTMLAnchorElement>('.quick-action');
     expect(quickAction?.getAttribute('href')).toBe('/movimentacoes?novo=1');
     expect(quickAction?.textContent).toContain('Nova movimentação');
 
-    const upcoming = page.querySelectorAll<HTMLElement>('.upcoming-item');
-    expect(upcoming).toHaveLength(2);
-    const labels = Array.from(upcoming).map((item) => item.querySelector('span')?.textContent);
-    expect(labels).toEqual(['Rendas', 'Cartões']);
-    for (const item of upcoming) {
-      expect(item.getAttribute('aria-disabled')).toBe('true');
-      expect(item.textContent).toContain('Em breve');
-      expect(item.closest('a')).toBeNull();
-    }
+    expect(page.querySelectorAll('.upcoming-item')).toHaveLength(0);
+    expect(page.querySelector('.upcoming-links')).toBeNull();
   });
 
   it('oferece barra inferior com os destinos essenciais e ação de adicionar', async () => {
@@ -65,13 +72,19 @@ describe('PrivateHeaderComponent', () => {
     expect(bottomNav?.getAttribute('aria-label')).toBe('Navegação rápida');
 
     const links = Array.from(bottomNav?.querySelectorAll('a') ?? []);
-    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/inicio', '/movimentacoes', '/movimentacoes?novo=1']);
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/inicio',
+      '/movimentacoes',
+      '/movimentacoes?novo=1',
+      '/planejamento',
+      '/dividas',
+    ]);
 
     const add = bottomNav?.querySelector<HTMLAnchorElement>('.bottom-nav__add');
     expect(add?.getAttribute('aria-label')).toBe('Nova movimentação');
   });
 
-  it('abre e fecha as ações da conta pelo avatar e emite logout', async () => {
+  it('abre e fecha as ações da conta pelo avatar, expõe atalho para Cartões e emite logout', async () => {
     const fixture = await createFixture();
     const page = fixture.nativeElement as HTMLElement;
     const avatar = page.querySelector<HTMLButtonElement>('.mobile-avatar')!;
@@ -86,7 +99,22 @@ describe('PrivateHeaderComponent', () => {
     const menu = page.querySelector('.mobile-account');
     expect(menu).toBeTruthy();
 
-    menu!.querySelector<HTMLButtonElement>('.logout')!.click();
+    const cardsShortcut = menu!.querySelector<HTMLAnchorElement>('a[href="/cartoes"]');
+    expect(cardsShortcut).toBeTruthy();
+    expect(cardsShortcut?.textContent).toContain('Cartões de crédito');
+    cardsShortcut!.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(TestBed.inject(Router).url).toBe('/cartoes');
+    expect(page.querySelector('.mobile-account')).toBeNull();
+
+    const moreButton = page.querySelector<HTMLButtonElement>('.bottom-nav__more')!;
+    moreButton.click();
+    fixture.detectChanges();
+    const reopenedMenu = page.querySelector('.mobile-account');
+    expect(reopenedMenu).toBeTruthy();
+
+    reopenedMenu!.querySelector<HTMLButtonElement>('.logout')!.click();
     fixture.detectChanges();
     expect(logoutCount).toBe(1);
     expect(page.querySelector('.mobile-account')).toBeNull();

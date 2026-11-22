@@ -49,6 +49,40 @@
               <div class="period-result kpi kpi--result"><dt>Resultado do mês</dt><dd [class.positive]="data.resultado > 0" [class.negative]="data.resultado < 0">{{ formatSignedMoney(data.resultado) }}</dd><p>Entradas menos saídas</p></div>
             </dl>
 
+            <section class="planning-overview-card" aria-labelledby="planning-overview-title">
+              <header class="section-heading">
+                <div>
+                  <h2 id="planning-overview-title">Planejamento fixo mensal</h2>
+                  <p>Renda prevista ativa vs. gastos recorrentes ativos</p>
+                </div>
+                <a routerLink="/planejamento">Gerenciar planejamento <span aria-hidden="true">↗</span></a>
+              </header>
+              @if (hasPlanningItems) {
+                <dl class="planning-metrics" aria-label="Indicadores de planejamento fixo">
+                  <div>
+                    <dt>Renda prevista ativa</dt>
+                    <dd class="positive">{{ formatMoney(plannedIncomesTotal) }}</dd>
+                  </div>
+                  <div>
+                    <dt>Gastos fixos ativos</dt>
+                    <dd class="negative">{{ formatMoney(plannedExpensesTotal) }}</dd>
+                  </div>
+                  <div>
+                    <dt>Margem livre prevista</dt>
+                    <dd [class.positive]="plannedFreeMargin > 0" [class.negative]="plannedFreeMargin < 0">
+                      {{ formatSignedMoney(plannedFreeMargin) }}
+                    </dd>
+                    <span>{{ plannedCommitmentPercent }}% da renda comprometida</span>
+                  </div>
+                </dl>
+              } @else {
+                <div class="planning-empty-cta">
+                  <p>Mapeie suas fontes de renda e despesas recorrentes para enxergar seu comprometimento fixo mensal.</p>
+                  <a class="text-action" routerLink="/planejamento">Configurar planejamento fixo</a>
+                </div>
+              }
+            </section>
+
             <section class="recent-section" aria-labelledby="recent-title">
               <header class="section-heading">
                 <div><h2 id="recent-title">Últimos registros</h2><p>{{ data.quantidade }} {{ data.quantidade === 1 ? 'movimentação no mês' : 'movimentações no mês' }}{{ data.quantidade > 5 ? ' · mostrando as 5 mais recentes' : '' }}</p></div>

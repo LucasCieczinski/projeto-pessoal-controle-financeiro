@@ -35,29 +35,29 @@ As 4 tabelas da Onda 2 já estão criadas e validadas nas migrations `V1__create
 **Objetivo:** Permitir ao usuário mapear suas entradas fixas previstas e seus custos fixos mensais, calculando o **Comprometimento Fixo da Renda**.
 
 #### Checklist Backend (`api-financas`)
-- [ ] **Constantes de Rota (`ApiPaths.java`):** Adicionar `INCOMES = API_V1 + "/rendas"` e `RECURRING_EXPENSES = API_V1 + "/gastos-recorrentes"`.
-- [ ] **Camada `domain`:**
-  - [ ] Criar `domain.model.Income` (higienização `trim()` de `fonte`, validação `valorBase > 0`, flag `ativo`).
-  - [ ] Criar `domain.model.RecurringExpense` (higienização `trim()` de `descricao`, validação `valor > 0`, `diaVencimento` entre `1` e `31`, flag `ativo`).
-  - [ ] Criar `domain.exception.IncomeNotFoundException` e `RecurringExpenseNotFoundException`.
-  - [ ] Criar `domain.port.IncomeRepositoryPort` e `domain.port.RecurringExpenseRepositoryPort`.
-- [ ] **Camada `application`:**
-  - [ ] Criar DTOs (`IncomeRequestDTO`, `IncomeResponseDTO`, `RecurringExpenseRequestDTO`, `RecurringExpenseResponseDTO`).
-  - [ ] Criar `application.usecase.IncomeUseCase` e `application.usecase.RecurringExpenseUseCase`.
-- [ ] **Camada `infrastructure`:**
-  - [ ] Criar `IncomeEntity`, `IncomeJpaRepository` e `IncomePersistenceAdapter`.
-  - [ ] Criar `RecurringExpenseEntity`, `RecurringExpenseJpaRepository` e `RecurringExpensePersistenceAdapter`.
-- [ ] **Camada `adapter` (Web):**
-  - [ ] Criar `IncomeController` (`/api/v1/rendas`) e `RecurringExpenseController` (`/api/v1/gastos-recorrentes`).
-- [ ] **Testes Automatizados:**
-  - [ ] Testes unitários de domínio (`IncomeTest`, `RecurringExpenseTest`).
-  - [ ] Teste de integração `MockMvc` (`PlanningFlowIntegrationTest`).
+- [x] **Constantes de Rota (`ApiPaths.java`):** Adicionar `INCOMES = API_V1 + "/rendas"` e `RECURRING_EXPENSES = API_V1 + "/gastos-recorrentes"`.
+- [x] **Camada `domain`:**
+  - [x] Criar `domain.model.Income` (higienização `trim()` de `fonte`, validação `valorBase > 0`, flag `ativo`).
+  - [x] Criar `domain.model.RecurringExpense` (higienização `trim()` de `descricao`, validação `valor > 0`, `diaVencimento` entre `1` e `31`, flag `ativo`).
+  - [x] Criar `domain.exception.IncomeNotFoundException` e `RecurringExpenseNotFoundException`.
+  - [x] Criar `domain.port.IncomeRepositoryPort` e `domain.port.RecurringExpenseRepositoryPort`.
+- [x] **Camada `application`:**
+  - [x] Criar DTOs (`IncomeRequestDto`, `IncomeResponseDto`, `RecurringExpenseRequestDto`, `RecurringExpenseResponseDto`).
+  - [x] Criar `application.usecase.IncomeUseCase` e `application.usecase.RecurringExpenseUseCase`.
+- [x] **Camada `infrastructure`:**
+  - [x] Criar `IncomeEntity`, `IncomeJpaRepository` e `IncomePersistenceAdapter`.
+  - [x] Criar `RecurringExpenseEntity`, `RecurringExpenseJpaRepository` e `RecurringExpensePersistenceAdapter`.
+- [x] **Camada `adapter` (Web):**
+  - [x] Criar `IncomeController` (`/api/v1/rendas`) e `RecurringExpenseController` (`/api/v1/gastos-recorrentes`).
+- [x] **Testes Automatizados:**
+  - [x] Testes unitários de domínio (`IncomeTest`, `RecurringExpenseTest`).
+  - [x] Teste de integração `MockMvc` (`PlanningFlowIntegrationTest`).
 
 #### Checklist Frontend (`web-financas`)
-- [ ] Criar `PlanningService` consumindo `/api/v1/rendas` e `/api/v1/gastos-recorrentes`.
-- [ ] Criar tela/componente de **Planejamento Fixo** (Fontes de Renda e Gastos Recorrentes).
-- [ ] Exibir indicador de **Renda Prevista vs. Gastos Fixos** no resumo (`/inicio`).
-- [ ] Testes unitários no Vitest.
+- [x] Criar `PlanningService` consumindo `/api/v1/rendas` e `/api/v1/gastos-recorrentes`.
+- [x] Criar tela/componente de **Planejamento Fixo** (Fontes de Renda e Gastos Recorrentes).
+- [x] Exibir indicador de **Renda Prevista vs. Gastos Fixos** no resumo (`/inicio`).
+- [x] Testes unitários no Vitest.
 
 ---
 
@@ -65,21 +65,21 @@ As 4 tabelas da Onda 2 já estão criadas e validadas nas migrations `V1__create
 **Objetivo:** Visibilidade total às dívidas e parcelamentos do usuário, com cálculo automático de progresso de quitação e regras ricas de transição de status no domínio.
 
 #### Checklist Backend (`api-financas`)
-- [ ] **Constantes de Rota (`ApiPaths.java`):** Adicionar `DEBTS = API_V1 + "/dividas"`.
-- [ ] **Camada `domain`:**
-  - [ ] Criar enum `domain.model.DebtStatus` (`ABERTA`, `QUITADA`, `ATRASADA`).
-  - [ ] Criar `domain.model.Debt` com invariantes (`valorTotal > 0`, `parcelasPagas <= totalParcelas`, transição automática para `QUITADA` ao quitar todas as parcelas e método `registrarPagamentoParcela()`).
-  - [ ] Criar `domain.exception.DebtNotFoundException` e `domain.port.DebtRepositoryPort`.
-- [ ] **Camada `application`, `infrastructure` & `adapter`:**
-  - [ ] Criar `DebtRequestDTO`, `DebtResponseDTO` e `DebtUseCase`.
-  - [ ] Criar `DebtEntity`, `DebtJpaRepository` e `DebtPersistenceAdapter`.
-  - [ ] Criar `DebtController` (`/api/v1/dividas` + `PATCH /api/v1/dividas/{id}/pagar-parcela`).
-- [ ] **Testes Automatizados:**
-  - [ ] `DebtTest` + `DebtFlowIntegrationTest`.
+- [x] **Constantes de Rota (`ApiPaths.java`):** Adicionar `DEBTS = API_V1 + "/dividas"`.
+- [x] **Camada `domain`:**
+  - [x] Criar enum `domain.model.DebtStatus` (`ABERTA`, `QUITADA`, `ATRASADA`).
+  - [x] Criar `domain.model.Debt` com invariantes (`valorTotal > 0`, `parcelasPagas <= totalParcelas`, transição automática para `QUITADA` ao quitar todas as parcelas e método `registrarPagamentoParcela()`).
+  - [x] Criar `domain.exception.DebtNotFoundException` e `domain.port.DebtRepositoryPort`.
+- [x] **Camada `application`, `infrastructure` & `adapter`:**
+  - [x] Criar `DebtRequestDto`, `DebtResponseDto` e `DebtUseCase`.
+  - [x] Criar `DebtEntity`, `DebtJpaRepository` e `DebtPersistenceAdapter`.
+  - [x] Criar `DebtController` (`/api/v1/dividas` + `PATCH /api/v1/dividas/{id}/pagar-parcela`).
+- [x] **Testes Automatizados:**
+  - [x] `DebtTest` + `DebtFlowIntegrationTest`.
 
 #### Checklist Frontend (`web-financas`)
-- [ ] Criar interface de **Dívidas & Parcelamentos** com barra de progresso (`parcelasPagas / totalParcelas`), filtro por status e ação rápida de pagar parcela.
-- [ ] Testes unitários no Vitest.
+- [x] Criar interface de **Dívidas & Parcelamentos** com barra de progresso (`parcelasPagas / totalParcelas`), filtro por status e ação rápida de pagar parcela.
+- [x] Testes unitários no Vitest.
 
 ---
 
@@ -87,21 +87,21 @@ As 4 tabelas da Onda 2 já estão criadas e validadas nas migrations `V1__create
 **Objetivo:** Gerenciamento de cartões de crédito (limites, datas de fechamento e vencimento) e consolidação do panorama financeiro da Onda 2.
 
 #### Checklist Backend (`api-financas`)
-- [ ] **Constantes de Rota (`ApiPaths.java`):** Adicionar `CREDIT_CARDS = API_V1 + "/cartoes"`.
-- [ ] **Camada `domain`:**
-  - [ ] Criar `domain.model.CreditCard` (validações: `limite >= 0`, `diaFechamento` entre `1..31`, `diaVencimento` entre `1..31`).
-  - [ ] Criar `domain.exception.CreditCardNotFoundException` e `domain.port.CreditCardRepositoryPort`.
-- [ ] **Camada `application`, `infrastructure` & `adapter`:**
-  - [ ] Criar `CreditCardRequestDTO`, `CreditCardResponseDTO` e `CreditCardUseCase`.
-  - [ ] Criar `CreditCardEntity`, `CreditCardJpaRepository` e `CreditCardPersistenceAdapter`.
-  - [ ] Criar `CreditCardController` (`/api/v1/cartoes`).
-- [ ] **Testes Automatizados & Documentação:**
-  - [ ] `CreditCardTest` + `CreditCardFlowIntegrationTest`.
-  - [ ] Atualizar `README.md` com as novas rotas da Onda 2.
+- [x] **Constantes de Rota (`ApiPaths.java`):** Adicionar `CREDIT_CARDS = API_V1 + "/cartoes"`.
+- [x] **Camada `domain`:**
+  - [x] Criar `domain.model.CreditCard` (validações: `limite >= 0`, `diaFechamento` entre `1..31`, `diaVencimento` entre `1..31`).
+  - [x] Criar `domain.exception.CreditCardNotFoundException` e `domain.port.CreditCardRepositoryPort`.
+- [x] **Camada `application`, `infrastructure` & `adapter`:**
+  - [x] Criar `CreditCardRequestDto`, `CreditCardResponseDto` e `CreditCardUseCase`.
+  - [x] Criar `CreditCardEntity`, `CreditCardJpaRepository` e `CreditCardPersistenceAdapter`.
+  - [x] Criar `CreditCardController` (`/api/v1/cartoes`).
+- [x] **Testes Automatizados & Documentação:**
+  - [x] `CreditCardTest` + `CreditCardFlowIntegrationTest`.
+  - [x] Atualizar `README.md` com as novas rotas da Onda 2.
 
 #### Checklist Frontend (`web-financas`)
-- [ ] Criar seção/tela de **Cartões de Crédito** exibindo limite total, dia de fechamento e dia de vencimento.
-- [ ] Testes unitários no Vitest.
+- [x] Criar seção/tela de **Cartões de Crédito** exibindo limite total, dia de fechamento e dia de vencimento.
+- [x] Testes unitários no Vitest.
 
 ---
 

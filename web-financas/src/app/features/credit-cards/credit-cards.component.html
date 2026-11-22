@@ -1,0 +1,259 @@
+<main class="credit-cards-page">
+  <div class="page-width">
+    <app-private-header context="Cartões de crédito" (logoutRequested)="logout()" />
+
+    @if (sessionError) {
+      <p class="page-alert" role="alert">{{ sessionError }}</p>
+    }
+
+    <nav class="breadcrumbs" aria-label="Você está aqui">
+      <a routerLink="/inicio">Resumo</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Cartões de crédito</span>
+    </nav>
+
+    <section class="page-intro" aria-labelledby="credit-cards-title">
+      <div class="intro-copy">
+        <p class="welcome-label">CARTEIRA DE CRÉDITO · ONDA 2</p>
+        <h1 id="credit-cards-title">Cartões de crédito</h1>
+        <p class="intro-lead">Organize seus limites disponíveis, acompanhe datas de fechamento e vencimento e identifique o melhor dia para comprar.</p>
+      </div>
+      <div class="intro-actions">
+        <button class="primary-action" type="button" (click)="openCardEditor()">
+          <span aria-hidden="true">+</span> Novo cartão
+        </button>
+      </div>
+    </section>
+
+    @if (successMessage) {
+      <p class="success-alert" role="status">{{ successMessage }}</p>
+    }
+
+    @if (isLoading) {
+      <section class="state-card loading-state" role="status">
+        <span class="loading-mark" aria-hidden="true"></span>
+        <p>Carregando seus cartões de crédito...</p>
+      </section>
+    } @else if (loadError) {
+      <section class="state-card error-state" role="alert">
+        <span class="state-symbol" aria-hidden="true">!</span>
+        <h2>Não foi possível carregar seus cartões</h2>
+        <p>{{ loadError }}</p>
+        <button type="button" class="text-action" (click)="loadCreditCards()">Tentar novamente <span aria-hidden="true">↗</span></button>
+      </section>
+    } @else {
+      <section class="cards-summary" aria-label="Resumo de cartões de crédito">
+        <div class="kpi-card kpi-card--limit">
+          <dt><span class="summary-dot limit" aria-hidden="true"></span> Limite total consolidado</dt>
+          <dd class="kpi-value limit">{{ formatMoney(totalLimitAmount) }}</dd>
+          <p class="kpi-hint">
+            @if (cardsCount > 0) {
+              Soma dos limites cadastrados em toda a carteira
+            } @else {
+              Cadastre seus cartões para consolidar seus limites
+            }
+          </p>
+        </div>
+
+        <div class="kpi-card kpi-card--count">
+          <dt><span class="summary-dot count" aria-hidden="true"></span> Cartões cadastrados</dt>
+          <dd class="kpi-value">{{ cardsCount }} {{ cardsCount === 1 ? 'cartão cadastrado' : 'cartões cadastrados' }}</dd>
+          <p class="kpi-hint">
+            @if (cardsCount > 0) {
+              Limite médio de {{ formatMoney(averageLimitAmount) }} por cartão
+            } @else {
+              Nenhum cartão registrado até o momento
+            }
+          </p>
+        </div>
+
+        <div class="kpi-card kpi-card--due">
+          <dt><span class="summary-dot due" aria-hidden="true"></span> Próximo vencimento</dt>
+          <dd class="kpi-value kpi-value--compact">{{ nextDueLabel }}</dd>
+          <p class="kpi-hint">{{ nextDueHint }}</p>
+        </div>
+      </section>
+
+      <section class="cards-panel" aria-labelledby="cards-list-title">
+        <header class="panel-header">
+          <div>
+            <h2 id="cards-list-title">Meus cartões</h2>
+            <p>{{ cardsCount }} {{ cardsCount === 1 ? 'cartão na carteira' : 'cartões na carteira' }}</p>
+          </div>
+          <button type="button" class="panel-action" (click)="openCardEditor()">+ Adicionar cartão</button>
+        </header>
+
+        @if (creditCards.length === 0) {
+          <div class="empty-panel">
+            <h3>Nenhum cartão de crédito cadastrado</h3>
+            <p>Adicione seus cartões com limite, dia de fechamento e vencimento para acompanhar seu ciclo mensal.</p>
+            <button type="button" class="text-action" (click)="openCardEditor()">Cadastrar primeiro cartão</button>
+          </div>
+        } @else {
+          <ul class="card-list" aria-label="Lista de cartões de crédito">
+            @for (card of creditCards; track card.id) {
+              <li class="card-row">
+                <div class="card-main">
+                  <div class="card-title-row">
+                    <h3>{{ card.nomeCartao }}</h3>
+                  </div>
+
+                  <strong class="card-limit">{{ formatMoney(card.limite) }}</strong>
+
+                  <div class="card-cycle">
+                    <span class="cycle-badge">Fecha dia {{ card.diaFechamento }}</span>
+                    <span class="cycle-badge cycle-badge--best">Melhor dia: {{ bestPurchaseDay(card) }}</span>
+                    <span class="cycle-badge cycle-badge--due">Vence dia {{ card.diaVencimento }}</span>
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    [attr.aria-label]="'Editar ' + card.nomeCartao"
+                    (click)="openCardEditor(card)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="delete-action"
+                    [attr.aria-label]="'Excluir ' + card.nomeCartao"
+                    (click)="requestDeleteCard(card)">
+                    Excluir
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+
+    <p class="page-footnote">
+      <span>À TONA / CARTÕES DE CRÉDITO</span> O gerenciamento de limites e ciclos organiza suas datas e não altera automaticamente o saldo realizado do livro-caixa.
+    </p>
+  </div>
+
+  <app-modal
+    [(open)]="cardEditorOpen"
+    [title]="editingCard ? 'Editar cartão de crédito' : 'Novo cartão de crédito'"
+    [description]="editingCard ? 'Atualize o nome, o limite ou as datas do ciclo deste cartão.' : 'Cadastre um cartão com seu limite e dias de fechamento e vencimento.'"
+    [confirmLabel]="editingCard ? 'Salvar alterações' : 'Salvar cartão'"
+    busyLabel="Salvando..."
+    [busy]="isSavingCard"
+    submitForm="card-form"
+    (closed)="cardSaveError = ''">
+    <form #cardFormElement id="card-form" [formGroup]="cardForm" (ngSubmit)="saveCard()" novalidate>
+      <fieldset class="editor-fields" [disabled]="isSavingCard">
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label for="card-name">Nome do cartão</label>
+            <input
+              id="card-name"
+              modalInitialFocus
+              formControlName="nomeCartao"
+              type="text"
+              maxlength="50"
+              placeholder="Ex.: Cartão Nubank"
+              autocomplete="off"
+              [attr.aria-invalid]="cardFieldInvalid('nomeCartao')"
+              [attr.aria-describedby]="cardFieldInvalid('nomeCartao') ? 'card-name-error' : null" />
+            @if (cardFieldInvalid('nomeCartao')) {
+              <p class="field-error" id="card-name-error">Informe o nome do cartão (máx. 50 caracteres).</p>
+            }
+          </div>
+
+          <div class="form-field full-width">
+            <label for="card-limit">Limite do cartão</label>
+            <div class="money-input">
+              <span>R$</span>
+              <input
+                id="card-limit"
+                formControlName="limite"
+                type="text"
+                inputmode="decimal"
+                maxlength="18"
+                placeholder="0,00"
+                autocomplete="off"
+                (blur)="formatCardLimitField()"
+                [attr.aria-invalid]="cardFieldInvalid('limite')"
+                [attr.aria-describedby]="cardFieldInvalid('limite') ? 'card-limit-error' : 'card-limit-hint'" />
+            </div>
+            @if (cardFieldInvalid('limite')) {
+              <p class="field-error" id="card-limit-error">Informe um limite válido a partir de 0,00.</p>
+            } @else {
+              <p class="field-hint" id="card-limit-hint">Use vírgula para os centavos. Limite 0,00 também é permitido.</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="card-closing-day">Dia de fechamento</label>
+            <input
+              id="card-closing-day"
+              formControlName="diaFechamento"
+              type="number"
+              min="1"
+              max="31"
+              placeholder="Ex.: 8"
+              [attr.aria-invalid]="cardFieldInvalid('diaFechamento')"
+              [attr.aria-describedby]="cardFieldInvalid('diaFechamento') ? 'card-closing-error' : 'card-closing-hint'" />
+            @if (cardFieldInvalid('diaFechamento')) {
+              <p class="field-error" id="card-closing-error">Escolha um dia entre 1 e 31.</p>
+            } @else {
+              <p class="field-hint" id="card-closing-hint">
+                @if (closingDayPreview !== null) {
+                  Melhor dia para compras: dia {{ closingDayPreview }}.
+                } @else {
+                  Dia do mês em que a fatura fecha (1 a 31).
+                }
+              </p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="card-due-day">Dia de vencimento</label>
+            <input
+              id="card-due-day"
+              formControlName="diaVencimento"
+              type="number"
+              min="1"
+              max="31"
+              placeholder="Ex.: 15"
+              [attr.aria-invalid]="cardFieldInvalid('diaVencimento')"
+              [attr.aria-describedby]="cardFieldInvalid('diaVencimento') ? 'card-due-error' : 'card-due-hint'" />
+            @if (cardFieldInvalid('diaVencimento')) {
+              <p class="field-error" id="card-due-error">Escolha um dia entre 1 e 31.</p>
+            } @else {
+              <p class="field-hint" id="card-due-hint">Dia do mês para pagamento da fatura (1 a 31).</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+      @if (cardSaveError) {
+        <p class="save-error" role="alert">{{ cardSaveError }}</p>
+      }
+    </form>
+  </app-modal>
+
+  <app-modal
+    [(open)]="cardDeleteOpen"
+    title="Excluir cartão de crédito?"
+    description="Este cartão será removido do seu controle de limites e vencimentos. Essa ação não pode ser desfeita."
+    confirmLabel="Excluir cartão"
+    cancelLabel="Manter cartão"
+    tone="danger"
+    busyLabel="Excluindo..."
+    [busy]="isDeletingCard"
+    (confirmed)="deleteCard()">
+    @if (deletingCard; as card) {
+      <div class="delete-preview">
+        <p>Fecha dia {{ card.diaFechamento }} · Melhor dia: {{ bestPurchaseDay(card) }} · Vence dia {{ card.diaVencimento }}</p>
+        <h3>{{ card.nomeCartao }}</h3>
+        <strong>{{ formatMoney(card.limite) }}</strong>
+      </div>
+    }
+    @if (cardDeleteError) {
+      <p class="save-error" role="alert">{{ cardDeleteError }}</p>
+    }
+  </app-modal>
+</main>
