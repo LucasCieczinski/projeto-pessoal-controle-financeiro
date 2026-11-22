@@ -28,6 +28,10 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14M5 10h14M5 16h9M5 21h14"/><path d="m16 15 3 3 3-3"/></svg>
       Movimentações
     </a>
+    <a routerLink="/planejamento" routerLinkActive="active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>
+      Planejamento
+    </a>
   </nav>
 
   <div class="quick-actions">
@@ -41,8 +45,8 @@
   <div class="upcoming-links">
     <p class="nav-label">EM BREVE &middot; ONDA 2</p>
     <span class="upcoming-item" aria-disabled="true">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>
-      <span>Rendas</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Dívidas</span>
       <em class="upcoming-badge">Em breve</em>
     </span>
     <span class="upcoming-item" aria-disabled="true">
@@ -87,6 +91,10 @@
     </a>
     <a class="bottom-nav__add" routerLink="/movimentacoes" [queryParams]="{ novo: '1' }" aria-label="Nova movimentação">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </a>
+    <a routerLink="/planejamento" routerLinkActive="active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>
+      <span>Planejamento</span>
     </a>
     <button class="bottom-nav__more" type="button" (click)="toggleAccountMenu()"
       [class.active]="accountMenuOpen()" [attr.aria-expanded]="accountMenuOpen()"

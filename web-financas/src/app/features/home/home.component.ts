@@ -2,9 +2,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { MovementSummary } from '../../core/movements/movement.models';
 import { MovementService } from '../../core/movements/movement.service';
+import { Income, RecurringExpense } from '../../core/planning/planning.models';
+import { PlanningService } from '../../core/planning/planning.service';
 import { PrivateHeaderComponent } from '../../shared/private-header/private-header.component';
 import { PeriodNavigationComponent } from '../../shared/period-navigation/period-navigation.component';
 
@@ -17,6 +20,7 @@ import { PeriodNavigationComponent } from '../../shared/period-navigation/period
 export class HomeComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly movements = inject(MovementService);
+  private readonly planningService = inject(PlanningService, { optional: true });
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly changeDetector = inject(ChangeDetectorRef);
@@ -27,6 +31,8 @@ export class HomeComponent implements OnInit {
   monthIndex = new Date().getMonth();
   firstName = '';
   summary?: MovementSummary;
+  incomes: Income[] = [];
+  recurringExpenses: RecurringExpense[] = [];
   isLoading = true;
   errorMessage = '';
   sessionError = '';
@@ -47,7 +53,58 @@ export class HomeComponent implements OnInit {
         if (error.status === 401) void this.router.navigate(['/login']);
       },
     });
+    this.loadPlanningOverview();
     this.loadSummary();
+  }
+
+  get hasPlanningItems(): boolean {
+    return this.incomes.length > 0 || this.recurringExpenses.length > 0;
+  }
+
+  get plannedIncomesCents(): number {
+    return this.incomes
+      .filter((item) => item.ativo)
+      .reduce((cents, item) => cents + Math.round(item.valorBase * 100), 0);
+  }
+
+  get plannedExpensesCents(): number {
+    return this.recurringExpenses
+      .filter((item) => item.ativo)
+      .reduce((cents, item) => cents + Math.round(item.valor * 100), 0);
+  }
+
+  get plannedIncomesTotal(): number {
+    return this.plannedIncomesCents / 100;
+  }
+
+  get plannedExpensesTotal(): number {
+    return this.plannedExpensesCents / 100;
+  }
+
+  get plannedFreeMargin(): number {
+    return (this.plannedIncomesCents - this.plannedExpensesCents) / 100;
+  }
+
+  get plannedCommitmentPercent(): number {
+    if (this.plannedIncomesCents <= 0) {
+      return this.plannedExpensesCents > 0 ? 100 : 0;
+    }
+    return Math.round((this.plannedExpensesCents / this.plannedIncomesCents) * 100);
+  }
+
+  loadPlanningOverview(): void {
+    const incomes$ = this.planningService?.listIncomes?.() ?? of<Income[]>([]);
+    const expenses$ = this.planningService?.listRecurringExpenses?.() ?? of<RecurringExpense[]>([]);
+    forkJoin({
+      incomes: incomes$.pipe(catchError(() => of<Income[]>([]))),
+      recurringExpenses: expenses$.pipe(catchError(() => of<RecurringExpense[]>([]))),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ incomes, recurringExpenses }) => {
+        this.incomes = incomes;
+        this.recurringExpenses = recurringExpenses;
+        this.changeDetector.markForCheck();
+      });
   }
 
   get monthKey(): string {

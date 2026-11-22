@@ -35,29 +35,29 @@ As 4 tabelas da Onda 2 já estão criadas e validadas nas migrations `V1__create
 **Objetivo:** Permitir ao usuário mapear suas entradas fixas previstas e seus custos fixos mensais, calculando o **Comprometimento Fixo da Renda**.
 
 #### Checklist Backend (`api-financas`)
-- [ ] **Constantes de Rota (`ApiPaths.java`):** Adicionar `INCOMES = API_V1 + "/rendas"` e `RECURRING_EXPENSES = API_V1 + "/gastos-recorrentes"`.
-- [ ] **Camada `domain`:**
-  - [ ] Criar `domain.model.Income` (higienização `trim()` de `fonte`, validação `valorBase > 0`, flag `ativo`).
-  - [ ] Criar `domain.model.RecurringExpense` (higienização `trim()` de `descricao`, validação `valor > 0`, `diaVencimento` entre `1` e `31`, flag `ativo`).
-  - [ ] Criar `domain.exception.IncomeNotFoundException` e `RecurringExpenseNotFoundException`.
-  - [ ] Criar `domain.port.IncomeRepositoryPort` e `domain.port.RecurringExpenseRepositoryPort`.
-- [ ] **Camada `application`:**
-  - [ ] Criar DTOs (`IncomeRequestDTO`, `IncomeResponseDTO`, `RecurringExpenseRequestDTO`, `RecurringExpenseResponseDTO`).
-  - [ ] Criar `application.usecase.IncomeUseCase` e `application.usecase.RecurringExpenseUseCase`.
-- [ ] **Camada `infrastructure`:**
-  - [ ] Criar `IncomeEntity`, `IncomeJpaRepository` e `IncomePersistenceAdapter`.
-  - [ ] Criar `RecurringExpenseEntity`, `RecurringExpenseJpaRepository` e `RecurringExpensePersistenceAdapter`.
-- [ ] **Camada `adapter` (Web):**
-  - [ ] Criar `IncomeController` (`/api/v1/rendas`) e `RecurringExpenseController` (`/api/v1/gastos-recorrentes`).
-- [ ] **Testes Automatizados:**
-  - [ ] Testes unitários de domínio (`IncomeTest`, `RecurringExpenseTest`).
-  - [ ] Teste de integração `MockMvc` (`PlanningFlowIntegrationTest`).
+- [x] **Constantes de Rota (`ApiPaths.java`):** Adicionar `INCOMES = API_V1 + "/rendas"` e `RECURRING_EXPENSES = API_V1 + "/gastos-recorrentes"`.
+- [x] **Camada `domain`:**
+  - [x] Criar `domain.model.Income` (higienização `trim()` de `fonte`, validação `valorBase > 0`, flag `ativo`).
+  - [x] Criar `domain.model.RecurringExpense` (higienização `trim()` de `descricao`, validação `valor > 0`, `diaVencimento` entre `1` e `31`, flag `ativo`).
+  - [x] Criar `domain.exception.IncomeNotFoundException` e `RecurringExpenseNotFoundException`.
+  - [x] Criar `domain.port.IncomeRepositoryPort` e `domain.port.RecurringExpenseRepositoryPort`.
+- [x] **Camada `application`:**
+  - [x] Criar DTOs (`IncomeRequestDto`, `IncomeResponseDto`, `RecurringExpenseRequestDto`, `RecurringExpenseResponseDto`).
+  - [x] Criar `application.usecase.IncomeUseCase` e `application.usecase.RecurringExpenseUseCase`.
+- [x] **Camada `infrastructure`:**
+  - [x] Criar `IncomeEntity`, `IncomeJpaRepository` e `IncomePersistenceAdapter`.
+  - [x] Criar `RecurringExpenseEntity`, `RecurringExpenseJpaRepository` e `RecurringExpensePersistenceAdapter`.
+- [x] **Camada `adapter` (Web):**
+  - [x] Criar `IncomeController` (`/api/v1/rendas`) e `RecurringExpenseController` (`/api/v1/gastos-recorrentes`).
+- [x] **Testes Automatizados:**
+  - [x] Testes unitários de domínio (`IncomeTest`, `RecurringExpenseTest`).
+  - [x] Teste de integração `MockMvc` (`PlanningFlowIntegrationTest`).
 
 #### Checklist Frontend (`web-financas`)
-- [ ] Criar `PlanningService` consumindo `/api/v1/rendas` e `/api/v1/gastos-recorrentes`.
-- [ ] Criar tela/componente de **Planejamento Fixo** (Fontes de Renda e Gastos Recorrentes).
-- [ ] Exibir indicador de **Renda Prevista vs. Gastos Fixos** no resumo (`/inicio`).
-- [ ] Testes unitários no Vitest.
+- [x] Criar `PlanningService` consumindo `/api/v1/rendas` e `/api/v1/gastos-recorrentes`.
+- [x] Criar tela/componente de **Planejamento Fixo** (Fontes de Renda e Gastos Recorrentes).
+- [x] Exibir indicador de **Renda Prevista vs. Gastos Fixos** no resumo (`/inicio`).
+- [x] Testes unitários no Vitest.
 
 ---
 

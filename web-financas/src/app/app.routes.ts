@@ -27,5 +27,12 @@ export const routes: Routes = [
       import('./features/movements/movements.component').then((component) => component.MovementsComponent),
     title: 'Movimentações | À Tona',
   },
+  {
+    path: 'planejamento',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/planning/planning.component').then((component) => component.PlanningComponent),
+    title: 'Planejamento Fixo | À Tona',
+  },
   { path: '**', redirectTo: '' },
 ];

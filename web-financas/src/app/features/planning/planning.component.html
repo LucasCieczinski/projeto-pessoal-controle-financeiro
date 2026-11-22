@@ -1,0 +1,384 @@
+<main class="planning-page">
+  <div class="page-width">
+    <app-private-header context="Planejamento fixo" (logoutRequested)="logout()" />
+
+    @if (sessionError) {
+      <p class="page-alert" role="alert">{{ sessionError }}</p>
+    }
+
+    <nav class="breadcrumbs" aria-label="Você está aqui">
+      <a routerLink="/inicio">Resumo</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Planejamento fixo</span>
+    </nav>
+
+    <section class="page-intro" aria-labelledby="planning-title">
+      <div class="intro-copy">
+        <p class="welcome-label">PLANEJAMENTO MENSAL · ONDA 2</p>
+        <h1 id="planning-title">Planejamento fixo</h1>
+        <p class="intro-lead">Enxergue suas fontes de renda previstas e seus custos fixos recorrentes antes mesmo do mês começar.</p>
+      </div>
+      <div class="intro-actions">
+        <button class="secondary-cta" type="button" (click)="openIncomeEditor()">
+          <span aria-hidden="true">+</span> Nova fonte de renda
+        </button>
+        <button class="primary-action" type="button" (click)="openExpenseEditor()">
+          <span aria-hidden="true">+</span> Novo gasto recorrente
+        </button>
+      </div>
+    </section>
+
+    @if (successMessage) {
+      <p class="success-alert" role="status">{{ successMessage }}</p>
+    }
+
+    @if (isLoading) {
+      <section class="state-card loading-state" role="status">
+        <span class="loading-mark" aria-hidden="true"></span>
+        <p>Calculando seu planejamento fixo...</p>
+      </section>
+    } @else if (loadError) {
+      <section class="state-card error-state" role="alert">
+        <span class="state-symbol" aria-hidden="true">!</span>
+        <h2>Não foi possível carregar o planejamento</h2>
+        <p>{{ loadError }}</p>
+        <button type="button" class="text-action" (click)="loadPlanning()">Tentar novamente <span aria-hidden="true">↗</span></button>
+      </section>
+    } @else {
+      <section class="commitment-summary" aria-label="Resumo de comprometimento fixo">
+        <div class="kpi-card kpi-card--income">
+          <dt><span class="summary-dot income" aria-hidden="true"></span> Rendas previstas ativas</dt>
+          <dd class="kpi-value income">{{ formatMoney(totalActiveIncomes) }}</dd>
+          <p class="kpi-hint">Soma das fontes de renda ativas</p>
+        </div>
+
+        <div class="kpi-card kpi-card--expense">
+          <dt><span class="summary-dot expense" aria-hidden="true"></span> Gastos recorrentes ativos</dt>
+          <dd class="kpi-value expense">{{ formatMoney(totalActiveExpenses) }}</dd>
+          <p class="kpi-hint">Custos fixos mensais previstos</p>
+        </div>
+
+        <div class="kpi-card kpi-card--margin">
+          <dt>Margem livre prevista</dt>
+          <dd class="kpi-value" [class.positive]="freeMargin > 0" [class.negative]="freeMargin < 0">
+            {{ formatSignedMoney(freeMargin) }}
+          </dd>
+          <p class="kpi-hint">{{ commitmentPercent }}% da renda ativa comprometida</p>
+        </div>
+      </section>
+
+      <div class="planning-grid">
+        <section class="planning-panel" aria-labelledby="incomes-title">
+          <header class="panel-header">
+            <div>
+              <h2 id="incomes-title">Fontes de renda</h2>
+              <p>{{ incomes.length }} {{ incomes.length === 1 ? 'fonte cadastrada' : 'fontes cadastradas' }}</p>
+            </div>
+            <button type="button" class="panel-action" (click)="openIncomeEditor()">+ Adicionar renda</button>
+          </header>
+
+          @if (incomes.length === 0) {
+            <div class="empty-panel">
+              <h3>Nenhuma fonte de renda prevista</h3>
+              <p>Cadastre seu salário, pró-labore ou contratos fixos para calcular sua margem mensal.</p>
+              <button type="button" class="text-action" (click)="openIncomeEditor()">Cadastrar primeira renda</button>
+            </div>
+          } @else {
+            <ul class="item-list" aria-label="Lista de fontes de renda">
+              @for (income of incomes; track income.id) {
+                <li class="item-row" [class.inactive]="!income.ativo">
+                  <div class="item-main">
+                    <div class="item-title-row">
+                      <h3>{{ income.fonte }}</h3>
+                      <span class="status-badge" [class.active]="income.ativo">
+                        {{ income.ativo ? 'Ativa' : 'Inativa' }}
+                      </span>
+                    </div>
+                    <strong class="item-amount income">{{ formatMoney(income.valorBase) }}</strong>
+                  </div>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      [disabled]="togglingIncomeId === income.id"
+                      [attr.aria-label]="(income.ativo ? 'Desativar ' : 'Ativar ') + income.fonte"
+                      (click)="toggleIncomeActive(income)">
+                      {{ income.ativo ? 'Desativar' : 'Ativar' }}
+                    </button>
+                    <button
+                      type="button"
+                      [attr.aria-label]="'Editar ' + income.fonte"
+                      (click)="openIncomeEditor(income)">
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="delete-action"
+                      [attr.aria-label]="'Excluir ' + income.fonte"
+                      (click)="requestDeleteIncome(income)">
+                      Excluir
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="planning-panel" aria-labelledby="expenses-title">
+          <header class="panel-header">
+            <div>
+              <h2 id="expenses-title">Gastos recorrentes</h2>
+              <p>{{ recurringExpenses.length }} {{ recurringExpenses.length === 1 ? 'compromisso fixo' : 'compromissos fixos' }}</p>
+            </div>
+            <button type="button" class="panel-action" (click)="openExpenseEditor()">+ Adicionar gasto fixo</button>
+          </header>
+
+          @if (sortedRecurringExpenses.length === 0) {
+            <div class="empty-panel">
+              <h3>Nenhum gasto recorrente cadastrado</h3>
+              <p>Registre aluguel, condomínio, internet ou assinaturas para acompanhar seu custo de vida fixo.</p>
+              <button type="button" class="text-action" (click)="openExpenseEditor()">Cadastrar primeiro gasto fixo</button>
+            </div>
+          } @else {
+            <ul class="item-list" aria-label="Lista de gastos recorrentes">
+              @for (expense of sortedRecurringExpenses; track expense.id) {
+                <li class="item-row" [class.inactive]="!expense.ativo">
+                  <div class="item-main">
+                    <div class="item-title-row">
+                      <h3>{{ expense.descricao }}</h3>
+                      <span class="due-badge">Todo dia {{ expense.diaVencimento }}</span>
+                      <span class="status-badge" [class.active]="expense.ativo">
+                        {{ expense.ativo ? 'Ativo' : 'Inativo' }}
+                      </span>
+                    </div>
+                    <strong class="item-amount expense">{{ formatMoney(expense.valor) }}</strong>
+                  </div>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      [disabled]="togglingExpenseId === expense.id"
+                      [attr.aria-label]="(expense.ativo ? 'Desativar ' : 'Ativar ') + expense.descricao"
+                      (click)="toggleExpenseActive(expense)">
+                      {{ expense.ativo ? 'Desativar' : 'Ativar' }}
+                    </button>
+                    <button
+                      type="button"
+                      [attr.aria-label]="'Editar ' + expense.descricao"
+                      (click)="openExpenseEditor(expense)">
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="delete-action"
+                      [attr.aria-label]="'Excluir ' + expense.descricao"
+                      (click)="requestDeleteExpense(expense)">
+                      Excluir
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+    }
+
+    <p class="page-footnote">
+      <span>À TONA / PLANEJAMENTO FIXO</span> Rendas e gastos recorrentes são modelos de previsão e não alteram automaticamente o saldo realizado do livro-caixa.
+    </p>
+  </div>
+
+  <app-modal
+    [(open)]="incomeEditorOpen"
+    [title]="editingIncome ? 'Editar fonte de renda' : 'Nova fonte de renda'"
+    [description]="editingIncome ? 'Atualize os dados desta fonte de renda prevista.' : 'Cadastre uma entrada mensal prevista para compor seu planejamento.'"
+    [confirmLabel]="editingIncome ? 'Salvar alterações' : 'Salvar fonte de renda'"
+    busyLabel="Salvando..."
+    [busy]="isSavingIncome"
+    submitForm="income-form"
+    (closed)="incomeSaveError = ''">
+    <form #incomeFormElement id="income-form" [formGroup]="incomeForm" (ngSubmit)="saveIncome()" novalidate>
+      <fieldset class="editor-fields" [disabled]="isSavingIncome">
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label for="income-source">Fonte de renda</label>
+            <input
+              id="income-source"
+              modalInitialFocus
+              formControlName="fonte"
+              type="text"
+              maxlength="100"
+              placeholder="Ex.: Salário CLT"
+              autocomplete="off"
+              [attr.aria-invalid]="incomeFieldInvalid('fonte')"
+              [attr.aria-describedby]="incomeFieldInvalid('fonte') ? 'income-source-error' : null" />
+            @if (incomeFieldInvalid('fonte')) {
+              <p class="field-error" id="income-source-error">Informe o nome da fonte de renda (máx. 100 caracteres).</p>
+            }
+          </div>
+
+          <div class="form-field full-width">
+            <label for="income-amount">Valor base mensal</label>
+            <div class="money-input">
+              <span>R$</span>
+              <input
+                id="income-amount"
+                formControlName="valorBase"
+                type="text"
+                inputmode="decimal"
+                maxlength="18"
+                placeholder="0,00"
+                autocomplete="off"
+                (blur)="formatIncomeAmountField()"
+                [attr.aria-invalid]="incomeFieldInvalid('valorBase')"
+                [attr.aria-describedby]="incomeFieldInvalid('valorBase') ? 'income-amount-error' : 'income-amount-hint'" />
+            </div>
+            @if (incomeFieldInvalid('valorBase')) {
+              <p class="field-error" id="income-amount-error">Informe um valor maior que zero, como 4.500,00.</p>
+            } @else {
+              <p class="field-hint" id="income-amount-hint">Use vírgula para os centavos.</p>
+            }
+          </div>
+
+          <div class="form-field full-width checkbox-field">
+            <label for="income-active">
+              <input id="income-active" formControlName="ativo" type="checkbox" />
+              <span>Considerar esta fonte ativa no cálculo mensal</span>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+      @if (incomeSaveError) {
+        <p class="save-error" role="alert">{{ incomeSaveError }}</p>
+      }
+    </form>
+  </app-modal>
+
+  <app-modal
+    [(open)]="incomeDeleteOpen"
+    title="Excluir fonte de renda?"
+    description="Esta fonte de renda deixará de fazer parte do seu planejamento fixo. Essa ação não pode ser desfeita."
+    confirmLabel="Excluir fonte de renda"
+    cancelLabel="Manter fonte"
+    tone="danger"
+    busyLabel="Excluindo..."
+    [busy]="isDeletingIncome"
+    (confirmed)="deleteIncome()">
+    @if (deletingIncome; as income) {
+      <div class="delete-preview">
+        <p>{{ income.ativo ? 'Ativa' : 'Inativa' }}</p>
+        <h3>{{ income.fonte }}</h3>
+        <strong>{{ formatMoney(income.valorBase) }}</strong>
+      </div>
+    }
+    @if (incomeDeleteError) {
+      <p class="save-error" role="alert">{{ incomeDeleteError }}</p>
+    }
+  </app-modal>
+
+  <app-modal
+    [(open)]="expenseEditorOpen"
+    [title]="editingExpense ? 'Editar gasto recorrente' : 'Novo gasto recorrente'"
+    [description]="editingExpense ? 'Atualize os dados deste compromisso mensal.' : 'Registre uma despesa fixa mensal com seu dia de vencimento.'"
+    [confirmLabel]="editingExpense ? 'Salvar alterações' : 'Salvar gasto recorrente'"
+    busyLabel="Salvando..."
+    [busy]="isSavingExpense"
+    submitForm="expense-form"
+    (closed)="expenseSaveError = ''">
+    <form #expenseFormElement id="expense-form" [formGroup]="expenseForm" (ngSubmit)="saveExpense()" novalidate>
+      <fieldset class="editor-fields" [disabled]="isSavingExpense">
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label for="expense-description">Descrição</label>
+            <input
+              id="expense-description"
+              modalInitialFocus
+              formControlName="descricao"
+              type="text"
+              maxlength="150"
+              placeholder="Ex.: Aluguel e condomínio"
+              autocomplete="off"
+              [attr.aria-invalid]="expenseFieldInvalid('descricao')"
+              [attr.aria-describedby]="expenseFieldInvalid('descricao') ? 'expense-description-error' : null" />
+            @if (expenseFieldInvalid('descricao')) {
+              <p class="field-error" id="expense-description-error">Informe a descrição do gasto recorrente (máx. 150 caracteres).</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="expense-amount">Valor mensal</label>
+            <div class="money-input">
+              <span>R$</span>
+              <input
+                id="expense-amount"
+                formControlName="valor"
+                type="text"
+                inputmode="decimal"
+                maxlength="18"
+                placeholder="0,00"
+                autocomplete="off"
+                (blur)="formatExpenseAmountField()"
+                [attr.aria-invalid]="expenseFieldInvalid('valor')"
+                [attr.aria-describedby]="expenseFieldInvalid('valor') ? 'expense-amount-error' : 'expense-amount-hint'" />
+            </div>
+            @if (expenseFieldInvalid('valor')) {
+              <p class="field-error" id="expense-amount-error">Informe um valor maior que zero, como 120,00.</p>
+            } @else {
+              <p class="field-hint" id="expense-amount-hint">Use vírgula para os centavos.</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="expense-due-day">Dia de vencimento</label>
+            <input
+              id="expense-due-day"
+              formControlName="diaVencimento"
+              type="number"
+              min="1"
+              max="31"
+              placeholder="10"
+              [attr.aria-invalid]="expenseFieldInvalid('diaVencimento')"
+              [attr.aria-describedby]="expenseFieldInvalid('diaVencimento') ? 'expense-day-error' : 'expense-day-hint'" />
+            @if (expenseFieldInvalid('diaVencimento')) {
+              <p class="field-error" id="expense-day-error">Escolha um dia entre 1 e 31.</p>
+            } @else {
+              <p class="field-hint" id="expense-day-hint">Dia do mês (1 a 31).</p>
+            }
+          </div>
+
+          <div class="form-field full-width checkbox-field">
+            <label for="expense-active">
+              <input id="expense-active" formControlName="ativo" type="checkbox" />
+              <span>Considerar este gasto ativo no cálculo mensal</span>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+      @if (expenseSaveError) {
+        <p class="save-error" role="alert">{{ expenseSaveError }}</p>
+      }
+    </form>
+  </app-modal>
+
+  <app-modal
+    [(open)]="expenseDeleteOpen"
+    title="Excluir gasto recorrente?"
+    description="Este compromisso fixo será removido do seu planejamento mensal. Essa ação não pode ser desfeita."
+    confirmLabel="Excluir gasto recorrente"
+    cancelLabel="Manter gasto"
+    tone="danger"
+    busyLabel="Excluindo..."
+    [busy]="isDeletingExpense"
+    (confirmed)="deleteExpense()">
+    @if (deletingExpense; as expense) {
+      <div class="delete-preview">
+        <p>Todo dia {{ expense.diaVencimento }} · {{ expense.ativo ? 'Ativo' : 'Inativo' }}</p>
+        <h3>{{ expense.descricao }}</h3>
+        <strong>{{ formatMoney(expense.valor) }}</strong>
+      </div>
+    }
+    @if (expenseDeleteError) {
+      <p class="save-error" role="alert">{{ expenseDeleteError }}</p>
+    }
+  </app-modal>
+</main>

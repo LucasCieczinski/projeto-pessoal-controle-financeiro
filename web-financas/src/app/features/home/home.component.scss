@@ -104,7 +104,17 @@ h1::after { color: #ed967b; }
 .summary-dot { width: 8px; height: 8px; background: #e8876b; }
 .summary-dot.income { background: #2f9e76; }
 
-.recent-section { margin: 0 20px 20px; border: 1px solid #e1e5ee; border-radius: 10px; overflow: hidden; }
+.recent-section,
+.planning-overview-card { margin: 0 20px 20px; border: 1px solid #e1e5ee; border-radius: 10px; overflow: hidden; }
+.planning-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 20px 24px; background: #fbfcfe; }
+.planning-metrics div + div { padding-left: 16px; border-left: 1px solid #e7eaf1; }
+.planning-metrics dt { color: var(--muted); font-size: 12px; }
+.planning-metrics dd { margin: 6px 0 0; color: #252b46; font: 700 18px 'Segoe UI', Arial, sans-serif; font-variant-numeric: tabular-nums; }
+.planning-metrics dd.positive { color: #1d805c; }
+.planning-metrics dd.negative { color: #b9503f; }
+.planning-metrics span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+.planning-empty-cta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 24px; background: #fbfcfe; }
+.planning-empty-cta p { max-width: 560px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 24px 18px; border-bottom: 1px solid #e7eaf1; }
 .section-heading h2 { color: #252b46; font: 600 19px 'Segoe UI', Arial, sans-serif; letter-spacing: -.4px; }
 .section-heading a { min-height: 36px; color: #303a64; font-size: 12px; font-weight: 700; }

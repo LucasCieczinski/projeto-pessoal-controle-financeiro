@@ -18,6 +18,8 @@ public final class ApiPaths {
 
     public static final String USERS = V1 + "/users";
     public static final String MOVEMENTS = V1 + "/movimentacoes";
+    public static final String INCOMES = V1 + "/rendas";
+    public static final String RECURRING_EXPENSES = V1 + "/gastos-recorrentes";
 
     private ApiPaths() {
         // Classe utilitária de constantes
