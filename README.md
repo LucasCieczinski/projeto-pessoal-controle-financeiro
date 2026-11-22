@@ -87,6 +87,15 @@ Todas as decisões estruturais de engenharia, segurança e performance do projet
 
 ---
 
+### 6. Engenharia de Software Aumentada por IA (Spec-Driven & Multi-Agent Governance)
+Para manter 100% de aderência arquitetural durante o desenvolvimento assistido por IA, o repositório versiona sua própria infraestrutura agêntica acoplada às Fitness Functions (`CleanArchitectureTest` e JaCoCo >= 80%):
+
+- **Rules Hierárquicas (`AGENTS.md`):** regras contextualizadas na raiz do produto ([`AGENTS.md`](./AGENTS.md)), no backend ([`api-financas/AGENTS.md`](./api-financas/AGENTS.md)) e no frontend ([`web-financas/AGENTS.md`](./web-financas/AGENTS.md)) impondo pureza da camada `domain`, precisão com `BigDecimal`, isolamento por `usuarioId` (Anti-IDOR) e proteção CSRF.
+- **Skills Operacionais ([`.agents/skills/`](./.agents/skills/)):** runbooks versionados para implementação de fatias verticais da Onda 2 (`onda2-vertical-slice`), auditoria de segurança bancária (`fintech-security-audit`) e escrita de ADRs (`adr-writer`).
+- **Subagentes Especializados ([`.agents/agents/`](./.agents/agents/)):** papéis dedicados para Backend Java Hexagonal (`java-hexagonal-architect`), Frontend Angular (`angular-ui-builder`) e Auditoria AppSec/QA (`fintech-sec-qa-reviewer`).
+
+---
+
 ## 🔌 Principais Endpoints da API (`/api/v1`)
 
 | Método | Rota | Descrição | Autenticação / CSRF |
