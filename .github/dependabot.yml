@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # 1. Monitoramento de vulnerabilidades e atualizações do Backend (Maven / Java 21)
+  - package-ecosystem: "maven"
+    directory: "/api-financas"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "backend"
+
+  # 2. Monitoramento de vulnerabilidades e atualizações do Frontend (NPM / Angular)
+  - package-ecosystem: "npm"
+    directory: "/web-financas"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  # 3. Monitoramento de versões das Actions do pipeline de CI/CD
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "ci-cd"

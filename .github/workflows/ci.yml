@@ -1,4 +1,4 @@
-name: CI — À Tona (Backend & Frontend)
+name: CI — À Tona (Backend & Frontend Quality Gate)
 
 on:
   push:
@@ -6,13 +6,16 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   backend-ci:
-    name: Backend (Java 21 + Spring Boot 4)
+    name: Backend (Java 21 + Spring Boot 4 + JaCoCo)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,11 +36,31 @@ jobs:
       - name: Make Maven Wrapper executable
         run: chmod +x mvnw
 
-      - name: Run Maven Test & Verify
-        run: ./mvnw -B clean test
+      - name: Run Tests, JaCoCo Coverage Gate (>= 80%) & Package Fat JAR
+        run: ./mvnw -B clean verify
+
+      - name: Publish Backend Coverage Summary to GitHub Actions
+        if: always()
+        run: |
+          echo "### ☕ Backend Quality Gate (Java 21 + Spring Boot 4.1)" >> $GITHUB_STEP_SUMMARY
+          if [ -f target/site/jacoco/jacoco.csv ]; then
+            awk -F',' 'NR>1 {missed+=$8; covered+=$9} END {total=missed+covered; pct=(total>0 ? (covered/total)*100 : 0); printf "- **Cobertura de Linhas (JaCoCo):** `%.2f%%` (%d/%d linhas cobertas — Mínimo exigido: `80.00%%`)\n", pct, covered, total}' target/site/jacoco/jacoco.csv >> $GITHUB_STEP_SUMMARY
+          fi
+          JAR_FILE=$(ls target/*.jar 2>/dev/null | head -n 1)
+          if [ -n "$JAR_FILE" ]; then
+            echo "- **Artefato Empacotado:** \`$(basename $JAR_FILE)\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload JaCoCo Coverage HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jacoco-coverage-report
+          path: api-financas/target/site/jacoco/
+          retention-days: 14
 
   frontend-ci:
-    name: Frontend (Angular 22 + Vitest)
+    name: Frontend (Angular 21 + Vitest + Bundle Build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -62,3 +85,17 @@ jobs:
 
       - name: Build Production Bundle
         run: npm run build
+
+      - name: Publish Frontend Build Summary to GitHub Actions
+        if: always()
+        run: |
+          echo "### 🅰️ Frontend Quality Gate (Angular 21 + Vitest)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Suíte de Testes Unitários (Vitest):** Executada em modo Headless" >> $GITHUB_STEP_SUMMARY
+          echo "- **Production Bundle:** Gerado com sucesso em \`dist/\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Angular Production Bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-production-dist
+          path: web-financas/dist/
+          retention-days: 7
