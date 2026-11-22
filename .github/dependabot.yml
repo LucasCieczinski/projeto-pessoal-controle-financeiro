@@ -10,6 +10,10 @@ updates:
     labels:
       - "dependencies"
       - "backend"
+    groups:
+      jjwt:
+        patterns:
+          - "io.jsonwebtoken:*"
 
   # 2. Monitoramento de vulnerabilidades e atualizações do Frontend (NPM / Angular)
   - package-ecosystem: "npm"
@@ -21,6 +25,14 @@ updates:
     labels:
       - "dependencies"
       - "frontend"
+    groups:
+      angular:
+        patterns:
+          - "@angular/*"
+          - "@angular-devkit/*"
+    ignore:
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
 
   # 3. Monitoramento de versões das Actions do pipeline de CI/CD
   - package-ecosystem: "github-actions"
@@ -32,3 +44,7 @@ updates:
     labels:
       - "dependencies"
       - "ci-cd"
+    groups:
+      github-actions:
+        patterns:
+          - "actions/*"
