@@ -87,21 +87,21 @@ As 4 tabelas da Onda 2 já estão criadas e validadas nas migrations `V1__create
 **Objetivo:** Gerenciamento de cartões de crédito (limites, datas de fechamento e vencimento) e consolidação do panorama financeiro da Onda 2.
 
 #### Checklist Backend (`api-financas`)
-- [ ] **Constantes de Rota (`ApiPaths.java`):** Adicionar `CREDIT_CARDS = API_V1 + "/cartoes"`.
-- [ ] **Camada `domain`:**
-  - [ ] Criar `domain.model.CreditCard` (validações: `limite >= 0`, `diaFechamento` entre `1..31`, `diaVencimento` entre `1..31`).
-  - [ ] Criar `domain.exception.CreditCardNotFoundException` e `domain.port.CreditCardRepositoryPort`.
-- [ ] **Camada `application`, `infrastructure` & `adapter`:**
-  - [ ] Criar `CreditCardRequestDTO`, `CreditCardResponseDTO` e `CreditCardUseCase`.
-  - [ ] Criar `CreditCardEntity`, `CreditCardJpaRepository` e `CreditCardPersistenceAdapter`.
-  - [ ] Criar `CreditCardController` (`/api/v1/cartoes`).
-- [ ] **Testes Automatizados & Documentação:**
-  - [ ] `CreditCardTest` + `CreditCardFlowIntegrationTest`.
-  - [ ] Atualizar `README.md` com as novas rotas da Onda 2.
+- [x] **Constantes de Rota (`ApiPaths.java`):** Adicionar `CREDIT_CARDS = API_V1 + "/cartoes"`.
+- [x] **Camada `domain`:**
+  - [x] Criar `domain.model.CreditCard` (validações: `limite >= 0`, `diaFechamento` entre `1..31`, `diaVencimento` entre `1..31`).
+  - [x] Criar `domain.exception.CreditCardNotFoundException` e `domain.port.CreditCardRepositoryPort`.
+- [x] **Camada `application`, `infrastructure` & `adapter`:**
+  - [x] Criar `CreditCardRequestDto`, `CreditCardResponseDto` e `CreditCardUseCase`.
+  - [x] Criar `CreditCardEntity`, `CreditCardJpaRepository` e `CreditCardPersistenceAdapter`.
+  - [x] Criar `CreditCardController` (`/api/v1/cartoes`).
+- [x] **Testes Automatizados & Documentação:**
+  - [x] `CreditCardTest` + `CreditCardFlowIntegrationTest`.
+  - [x] Atualizar `README.md` com as novas rotas da Onda 2.
 
 #### Checklist Frontend (`web-financas`)
-- [ ] Criar seção/tela de **Cartões de Crédito** exibindo limite total, dia de fechamento e dia de vencimento.
-- [ ] Testes unitários no Vitest.
+- [x] Criar seção/tela de **Cartões de Crédito** exibindo limite total, dia de fechamento e dia de vencimento.
+- [x] Testes unitários no Vitest.
 
 ---
 

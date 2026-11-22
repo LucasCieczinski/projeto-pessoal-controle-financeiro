@@ -21,6 +21,7 @@ public final class ApiPaths {
     public static final String INCOMES = V1 + "/rendas";
     public static final String RECURRING_EXPENSES = V1 + "/gastos-recorrentes";
     public static final String DEBTS = V1 + "/dividas";
+    public static final String CREDIT_CARDS = V1 + "/cartoes";
 
     private ApiPaths() {
         // Classe utilitária de constantes

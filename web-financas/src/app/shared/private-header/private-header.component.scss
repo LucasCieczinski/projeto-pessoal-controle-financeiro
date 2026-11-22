@@ -89,7 +89,6 @@
 .private-nav svg,
 .logout svg,
 .quick-action svg,
-.upcoming-item svg,
 .mobile-account svg,
 .bottom-nav svg {
   fill: none;
@@ -99,7 +98,6 @@
 
 .menu-toggle svg,
 .private-nav svg,
-.upcoming-item svg,
 .mobile-account svg,
 .bottom-nav svg {
   stroke-linejoin: round;
@@ -109,7 +107,6 @@
 // recolher existe só no desktop, onde a navegação vira a barra lateral.
 .menu-toggle,
 .quick-actions,
-.upcoming-links,
 .header-context,
 .mobile-avatar,
 .mobile-account,
@@ -124,6 +121,7 @@
   }
 
   .private-nav {
+    gap: 18px;
     margin-left: auto;
     margin-right: 0;
   }
@@ -284,23 +282,13 @@
     letter-spacing: 1.15px;
   }
 
-  .quick-actions,
-  .upcoming-links {
-    display: grid;
-  }
-
   .quick-actions {
+    display: grid;
     gap: 6px;
     margin-top: 18px;
   }
 
-  .upcoming-links {
-    gap: 5px;
-    margin-top: 16px;
-  }
-
-  .quick-action,
-  .upcoming-item {
+  .quick-action {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -308,9 +296,6 @@
     padding: 0;
     border-radius: 8px;
     font-size: 0;
-  }
-
-  .quick-action {
     color: #fff;
     background: var(--coral);
     text-decoration: none;
@@ -328,23 +313,6 @@
     height: 20px;
     flex: none;
     stroke-width: 2.2;
-  }
-
-  .upcoming-item {
-    color: #8b93b3;
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .upcoming-item svg {
-    width: 19px;
-    height: 19px;
-    flex: none;
-    stroke-width: 1.7;
-  }
-
-  .upcoming-badge {
-    display: none;
   }
 
   .account-area {
@@ -439,29 +407,11 @@
     margin-top: 34px;
   }
 
-  .sidebar--expanded .upcoming-links {
-    margin-top: 22px;
-  }
-
-  .sidebar--expanded .quick-action,
-  .sidebar--expanded .upcoming-item {
+  .sidebar--expanded .quick-action {
     justify-content: flex-start;
     gap: 12px;
     padding: 0 12px;
     font-size: 14px;
-  }
-
-  .sidebar--expanded .upcoming-badge {
-    display: inline-block;
-    margin-left: auto;
-    padding: 2px 7px;
-    border-radius: 999px;
-    color: #aeb7d5;
-    background: #303957;
-    font: 700 9px/1.4 'Segoe UI', Arial, sans-serif;
-    font-style: normal;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
   }
 
   .sidebar--expanded .account-area {
@@ -566,12 +516,48 @@
     top: 70px;
     right: 10px;
     z-index: 40;
-    min-width: 195px;
+    min-width: 215px;
     padding: 14px;
     border: 1px solid var(--line);
     border-radius: 10px;
     background: #fff;
     box-shadow: 0 14px 34px #11162b24;
+  }
+
+  .mobile-account__nav {
+    display: grid;
+    gap: 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ece8f0;
+  }
+
+  .mobile-account__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: 7px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .mobile-account__link:hover {
+    background: #f3eff7;
+  }
+
+  .mobile-account__link.active {
+    color: var(--ink);
+    background: var(--coral-light);
+  }
+
+  .mobile-account__link svg {
+    width: 17px;
+    height: 17px;
+    flex: none;
+    stroke-width: 1.7;
   }
 
   .mobile-account p {

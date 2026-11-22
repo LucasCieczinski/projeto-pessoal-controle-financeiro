@@ -41,5 +41,12 @@ export const routes: Routes = [
       import('./features/debts/debts.component').then((component) => component.DebtsComponent),
     title: 'Dívidas e Parcelamentos | À Tona',
   },
+  {
+    path: 'cartoes',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/credit-cards/credit-cards.component').then((component) => component.CreditCardsComponent),
+    title: 'Cartões de Crédito | À Tona',
+  },
   { path: '**', redirectTo: '' },
 ];

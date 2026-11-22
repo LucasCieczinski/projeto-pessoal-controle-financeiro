@@ -6,7 +6,7 @@ import { SidebarStateService } from './sidebar-state.service';
  * Navegação principal da área autenticada.
  *
  * - Desktop (>= 901px): sidebar fixa colapsável com marca, links, atalho rápido
- *   de "Nova movimentação", links de preparação da Onda 2 e área da conta.
+ *   de "Nova movimentação" e área da conta.
  * - Mobile (<= 620px): cabeçalho compacto (marca + mês ativo + avatar),
  *   barra inferior fixa (bottom navigation) e menu de ações da conta.
  */

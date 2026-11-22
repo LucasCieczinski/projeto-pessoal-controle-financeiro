@@ -2,12 +2,14 @@ package peres.lucas.apifinanceira;
 
 import org.junit.jupiter.api.Test;
 import peres.lucas.apifinanceira.application.usecase.AuthUseCase;
+import peres.lucas.apifinanceira.application.usecase.CreditCardUseCase;
 import peres.lucas.apifinanceira.application.usecase.DebtUseCase;
 import peres.lucas.apifinanceira.application.usecase.IncomeUseCase;
 import peres.lucas.apifinanceira.application.usecase.MovementUseCase;
 import peres.lucas.apifinanceira.application.usecase.RecurringExpenseUseCase;
 import peres.lucas.apifinanceira.application.usecase.UserUseCase;
 import peres.lucas.apifinanceira.domain.model.AuthSession;
+import peres.lucas.apifinanceira.domain.model.CreditCard;
 import peres.lucas.apifinanceira.domain.model.Debt;
 import peres.lucas.apifinanceira.domain.model.DebtStatus;
 import peres.lucas.apifinanceira.domain.model.Income;
@@ -17,6 +19,7 @@ import peres.lucas.apifinanceira.domain.model.MovementType;
 import peres.lucas.apifinanceira.domain.model.RecurringExpense;
 import peres.lucas.apifinanceira.domain.model.User;
 import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
+import peres.lucas.apifinanceira.domain.port.CreditCardRepositoryPort;
 import peres.lucas.apifinanceira.domain.port.DebtRepositoryPort;
 import peres.lucas.apifinanceira.domain.port.IncomeRepositoryPort;
 import peres.lucas.apifinanceira.domain.port.MovementRepositoryPort;
@@ -107,13 +110,15 @@ class CleanArchitectureTest {
                 RecurringExpense.class,
                 Debt.class,
                 DebtStatus.class,
+                CreditCard.class,
                 UserRepositoryPort.class,
                 MovementRepositoryPort.class,
                 AuthSessionRepositoryPort.class,
                 RateLimitPort.class,
                 IncomeRepositoryPort.class,
                 RecurringExpenseRepositoryPort.class,
-                DebtRepositoryPort.class
+                DebtRepositoryPort.class,
+                CreditCardRepositoryPort.class
         );
 
         for (Class<?> clazz : domainClasses) {
@@ -131,7 +136,8 @@ class CleanArchitectureTest {
                 AuthUseCase.class,
                 IncomeUseCase.class,
                 RecurringExpenseUseCase.class,
-                DebtUseCase.class
+                DebtUseCase.class,
+                CreditCardUseCase.class
         );
 
         for (Class<?> useCaseClass : applicationUseCases) {
