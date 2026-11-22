@@ -49,9 +49,9 @@ describe('PrivateHeaderComponent', () => {
     expect(quickAction?.textContent).toContain('Nova movimentação');
 
     const upcoming = page.querySelectorAll<HTMLElement>('.upcoming-item');
-    expect(upcoming).toHaveLength(2);
+    expect(upcoming).toHaveLength(1);
     const labels = Array.from(upcoming).map((item) => item.querySelector('span')?.textContent);
-    expect(labels).toEqual(['Dívidas', 'Cartões']);
+    expect(labels).toEqual(['Cartões']);
     for (const item of upcoming) {
       expect(item.getAttribute('aria-disabled')).toBe('true');
       expect(item.textContent).toContain('Em breve');
@@ -70,6 +70,7 @@ describe('PrivateHeaderComponent', () => {
       '/movimentacoes',
       '/movimentacoes?novo=1',
       '/planejamento',
+      '/dividas',
     ]);
 
     const add = bottomNav?.querySelector<HTMLAnchorElement>('.bottom-nav__add');

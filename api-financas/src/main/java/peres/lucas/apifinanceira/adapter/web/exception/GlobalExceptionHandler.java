@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import peres.lucas.apifinanceira.domain.exception.DebtNotFoundException;
 import peres.lucas.apifinanceira.domain.exception.EmailAlreadyInUseException;
 import peres.lucas.apifinanceira.domain.exception.IncomeNotFoundException;
 import peres.lucas.apifinanceira.domain.exception.InvalidCredentialException;
@@ -49,6 +50,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RecurringExpenseNotFoundException.class)
     public ResponseEntity<ErrorMessage> handleRecurringExpenseNotFound(RecurringExpenseNotFoundException e, HttpServletRequest request) {
+        ErrorMessage body = new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                request.getRequestURI(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(DebtNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleDebtNotFound(DebtNotFoundException e, HttpServletRequest request) {
         ErrorMessage body = new ErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",

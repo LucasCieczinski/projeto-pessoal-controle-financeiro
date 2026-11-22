@@ -59,7 +59,7 @@ export class PlanningComponent implements OnInit {
   readonly expenseForm = this.formBuilder.group({
     descricao: this.formBuilder.control('', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(150)]),
     valor: this.formBuilder.control('', [Validators.required, amountValidator]),
-    diaVencimento: this.formBuilder.control('10', [Validators.required, dueDayValidator]),
+    diaVencimento: this.formBuilder.control<string | number | null>('10', [Validators.required, dueDayValidator]),
     ativo: this.formBuilder.control(true),
   });
 
@@ -376,7 +376,8 @@ export class PlanningComponent implements OnInit {
 
     const value = this.expenseForm.getRawValue();
     const amount = parseAmount(value.valor);
-    const diaVencimento = Number(value.diaVencimento);
+    const dueDayRaw = String(value.diaVencimento ?? '').trim();
+    const diaVencimento = dueDayRaw === '' ? NaN : Number(dueDayRaw);
     if (amount === null || !Number.isInteger(diaVencimento) || diaVencimento < 1 || diaVencimento > 31) return;
 
     this.isSavingExpense = true;

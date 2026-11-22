@@ -2,11 +2,14 @@ package peres.lucas.apifinanceira;
 
 import org.junit.jupiter.api.Test;
 import peres.lucas.apifinanceira.application.usecase.AuthUseCase;
+import peres.lucas.apifinanceira.application.usecase.DebtUseCase;
 import peres.lucas.apifinanceira.application.usecase.IncomeUseCase;
 import peres.lucas.apifinanceira.application.usecase.MovementUseCase;
 import peres.lucas.apifinanceira.application.usecase.RecurringExpenseUseCase;
 import peres.lucas.apifinanceira.application.usecase.UserUseCase;
 import peres.lucas.apifinanceira.domain.model.AuthSession;
+import peres.lucas.apifinanceira.domain.model.Debt;
+import peres.lucas.apifinanceira.domain.model.DebtStatus;
 import peres.lucas.apifinanceira.domain.model.Income;
 import peres.lucas.apifinanceira.domain.model.Movement;
 import peres.lucas.apifinanceira.domain.model.MovementTotals;
@@ -14,6 +17,7 @@ import peres.lucas.apifinanceira.domain.model.MovementType;
 import peres.lucas.apifinanceira.domain.model.RecurringExpense;
 import peres.lucas.apifinanceira.domain.model.User;
 import peres.lucas.apifinanceira.domain.port.AuthSessionRepositoryPort;
+import peres.lucas.apifinanceira.domain.port.DebtRepositoryPort;
 import peres.lucas.apifinanceira.domain.port.IncomeRepositoryPort;
 import peres.lucas.apifinanceira.domain.port.MovementRepositoryPort;
 import peres.lucas.apifinanceira.domain.port.RateLimitPort;
@@ -101,12 +105,15 @@ class CleanArchitectureTest {
                 AuthSession.class,
                 Income.class,
                 RecurringExpense.class,
+                Debt.class,
+                DebtStatus.class,
                 UserRepositoryPort.class,
                 MovementRepositoryPort.class,
                 AuthSessionRepositoryPort.class,
                 RateLimitPort.class,
                 IncomeRepositoryPort.class,
-                RecurringExpenseRepositoryPort.class
+                RecurringExpenseRepositoryPort.class,
+                DebtRepositoryPort.class
         );
 
         for (Class<?> clazz : domainClasses) {
@@ -123,7 +130,8 @@ class CleanArchitectureTest {
                 MovementUseCase.class,
                 AuthUseCase.class,
                 IncomeUseCase.class,
-                RecurringExpenseUseCase.class
+                RecurringExpenseUseCase.class,
+                DebtUseCase.class
         );
 
         for (Class<?> useCaseClass : applicationUseCases) {

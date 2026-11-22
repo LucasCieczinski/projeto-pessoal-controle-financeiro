@@ -34,5 +34,12 @@ export const routes: Routes = [
       import('./features/planning/planning.component').then((component) => component.PlanningComponent),
     title: 'Planejamento Fixo | À Tona',
   },
+  {
+    path: 'dividas',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/debts/debts.component').then((component) => component.DebtsComponent),
+    title: 'Dívidas e Parcelamentos | À Tona',
+  },
   { path: '**', redirectTo: '' },
 ];

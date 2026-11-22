@@ -65,21 +65,21 @@ As 4 tabelas da Onda 2 já estão criadas e validadas nas migrations `V1__create
 **Objetivo:** Visibilidade total às dívidas e parcelamentos do usuário, com cálculo automático de progresso de quitação e regras ricas de transição de status no domínio.
 
 #### Checklist Backend (`api-financas`)
-- [ ] **Constantes de Rota (`ApiPaths.java`):** Adicionar `DEBTS = API_V1 + "/dividas"`.
-- [ ] **Camada `domain`:**
-  - [ ] Criar enum `domain.model.DebtStatus` (`ABERTA`, `QUITADA`, `ATRASADA`).
-  - [ ] Criar `domain.model.Debt` com invariantes (`valorTotal > 0`, `parcelasPagas <= totalParcelas`, transição automática para `QUITADA` ao quitar todas as parcelas e método `registrarPagamentoParcela()`).
-  - [ ] Criar `domain.exception.DebtNotFoundException` e `domain.port.DebtRepositoryPort`.
-- [ ] **Camada `application`, `infrastructure` & `adapter`:**
-  - [ ] Criar `DebtRequestDTO`, `DebtResponseDTO` e `DebtUseCase`.
-  - [ ] Criar `DebtEntity`, `DebtJpaRepository` e `DebtPersistenceAdapter`.
-  - [ ] Criar `DebtController` (`/api/v1/dividas` + `PATCH /api/v1/dividas/{id}/pagar-parcela`).
-- [ ] **Testes Automatizados:**
-  - [ ] `DebtTest` + `DebtFlowIntegrationTest`.
+- [x] **Constantes de Rota (`ApiPaths.java`):** Adicionar `DEBTS = API_V1 + "/dividas"`.
+- [x] **Camada `domain`:**
+  - [x] Criar enum `domain.model.DebtStatus` (`ABERTA`, `QUITADA`, `ATRASADA`).
+  - [x] Criar `domain.model.Debt` com invariantes (`valorTotal > 0`, `parcelasPagas <= totalParcelas`, transição automática para `QUITADA` ao quitar todas as parcelas e método `registrarPagamentoParcela()`).
+  - [x] Criar `domain.exception.DebtNotFoundException` e `domain.port.DebtRepositoryPort`.
+- [x] **Camada `application`, `infrastructure` & `adapter`:**
+  - [x] Criar `DebtRequestDto`, `DebtResponseDto` e `DebtUseCase`.
+  - [x] Criar `DebtEntity`, `DebtJpaRepository` e `DebtPersistenceAdapter`.
+  - [x] Criar `DebtController` (`/api/v1/dividas` + `PATCH /api/v1/dividas/{id}/pagar-parcela`).
+- [x] **Testes Automatizados:**
+  - [x] `DebtTest` + `DebtFlowIntegrationTest`.
 
 #### Checklist Frontend (`web-financas`)
-- [ ] Criar interface de **Dívidas & Parcelamentos** com barra de progresso (`parcelasPagas / totalParcelas`), filtro por status e ação rápida de pagar parcela.
-- [ ] Testes unitários no Vitest.
+- [x] Criar interface de **Dívidas & Parcelamentos** com barra de progresso (`parcelasPagas / totalParcelas`), filtro por status e ação rápida de pagar parcela.
+- [x] Testes unitários no Vitest.
 
 ---
 

@@ -20,6 +20,7 @@ public final class ApiPaths {
     public static final String MOVEMENTS = V1 + "/movimentacoes";
     public static final String INCOMES = V1 + "/rendas";
     public static final String RECURRING_EXPENSES = V1 + "/gastos-recorrentes";
+    public static final String DEBTS = V1 + "/dividas";
 
     private ApiPaths() {
         // Classe utilitária de constantes
